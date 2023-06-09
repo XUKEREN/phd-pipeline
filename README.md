@@ -1,2 +1,2 @@
-# scripts_phd
-This repo holds some sample scripts that I wrote for my PhD research projects
+# phd scripts
+- [year one screening exam](./year_one_screening_exam/)
