@@ -22,7 +22,7 @@ Two software (TelomereHunter and TelSeq) were applied to estimate telomere lengt
 
 - step 1: [run TelomereHunter](01.TelomereHunter.sh)
 - step 2: [run TelSeq](02.TelSeq.sh)
-- step 3: [aggregate outputs from individual bam files](03.summarize_report.sh)
+- step 3: [aggregate outputs from individual bam files](03.agg_individual_reports.sh)
 - step 4: [clean aggregated tables and generate final outputs](04.summary.R)
   - for telseq, to calculate TL for each sample, we need to take a weighted average of all the read groups within each sample: https://github.com/zd1/telseq/issues/1
 
