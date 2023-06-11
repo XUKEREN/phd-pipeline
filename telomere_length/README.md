@@ -28,5 +28,7 @@ Two software (TelomereHunter and TelSeq) were applied to estimate telomere lengt
 
 ## Example correlation plot
 
-- results from TelomereHunter and TelSeq had a high correlation  
-  ![an example correlation plot generated from step 4](./corr_plot.png)
+- results from TelomereHunter and TelSeq had a high correlation (an example correlation plot generated from step 4)
+<p align="center">
+<img src='corr_plot.png' width='500'>
+</p>
