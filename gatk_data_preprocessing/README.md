@@ -26,31 +26,31 @@ This workflow was written according to the following GATK official WDLs:
 
 ## Step 1: Fastqs to Unmapped BAMs
 
-- [1.1.1.PairedFastqToUnmappedBam.sh](1.1.1.PairedFastqToUnmappedBam.sh)
-- [1.1.2.ValidateSamFile.sh](1.1.2.ValidateSamFile.sh)
-- [1.1.3.SortSam.sh](1.1.3.SortSam.sh)
+- [1.1.PairedFastqToUnmappedBam.sh](1.1.PairedFastqToUnmappedBam.sh)
+- [1.2.ValidateSamFile.sh](1.2.ValidateSamFile.sh)
+- [1.3.SortSam.sh](1.3.SortSam.sh)
 
 ## Step 2: Unmapped BAMs to Mapped BAMs
 
-- [1.2.1.Bwa.sh](1.2.1.Bwa.sh)
-- [1.2.2.SortAlignedBam.sh](1.2.2.SortAlignedBam.sh)
-- [1.2.3.ValidateAlignedBam.sh](1.2.3.ValidateAlignedBam.sh)
-- [1.2.4.CheckIfAltAwareAlign.sh](1.2.4.CheckIfAltAwareAlign.sh)
+- [2.1.Bwa.sh](2.1.Bwa.sh)
+- [2.2.SortAlignedBam.sh](2.2.SortAlignedBam.sh)
+- [2.3.ValidateAlignedBam.sh](2.3.ValidateAlignedBam.sh)
+- [2.4.CheckIfAltAwareAlign.sh](2.4.CheckIfAltAwareAlign.sh)
 
 ## Step 3: Merge Unmapped BAMs and Mapped BAMs
 
-- [1.3.1.MergeBamAlignment.sh](1.3.1.MergeBamAlignment.sh)
-- [1.3.2.ValidateMergedBam.sh](1.3.2.ValidateMergedBam.sh)
-- [1.3.3.CountReads.sh](1.3.3.CountReads.sh)
+- [3.1.MergeBamAlignment.sh](3.1.MergeBamAlignment.sh)
+- [3.2.ValidateMergedBam.sh](3.2.ValidateMergedBam.sh)
+- [3.3.CountReads.sh](3.3.CountReads.sh)
 
 ## Step 4: MarkDuplicates
 
-- [1.4.1.MarkDuplicates.sh](1.4.1.MarkDuplicates.sh)
-- [1.4.2.SortAndFixTags.sh](1.4.2.SortAndFixTags.sh)
-- [1.4.3.ValidateSortedMarkedBam.sh](1.4.3.ValidateSortedMarkedBam.sh)
+- [4.1.MarkDuplicates.sh](4.1.MarkDuplicates.sh)
+- [4.2.SortAndFixTags.sh](4.2.SortAndFixTags.sh)
+- [4.3.ValidateSortedMarkedBam.sh](4.3.ValidateSortedMarkedBam.sh)
 
 ## Step 5: Base Quality Score Recalibration
 
-- [1.5.1.BaseRecalibrator.sh](1.5.1.BaseRecalibrator.sh)
-- [1.5.2.BqsrPlot.sh](1.5.2.BqsrPlot.sh)
-- [1.5.3.BqsrPlot.Rmd](1.5.3.BqsrPlot.Rmd)
+- [5.1.BaseRecalibrator.sh](5.1.BaseRecalibrator.sh)
+- [5.2.BqsrPlot.sh](5.2.BqsrPlot.sh)
+- [5.3.BqsrPlot.Rmd](5.3.BqsrPlot.Rmd)
