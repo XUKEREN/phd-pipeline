@@ -1,4 +1,4 @@
-# mitochondria
+# GATK4 mitochondria SNPs and INDELs pipeline
 
 This is an HPC workflow to call SNPs and INDELs in the mitochondrial genome from matched tumor-normal whole genome sequencing (WGS) data from 25 childhood acute lymphoblastic leukemia cases. This workflow is largely based on [GATK's best practice WDL](https://github.com/broadinstitute/gatk/blob/master/scripts/mitochondria_m2_wdl/MitochondriaPipeline.wdl). Check out [GATK's doc](https://github.com/broadinstitute/gatk-docs/blob/master/blog-2012-to-2019/2019-03-05-New!_Mitochondrial_Analysis_with_Mutect2.md?id=23598) for more details.
 
