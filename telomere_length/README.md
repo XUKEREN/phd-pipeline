@@ -9,7 +9,7 @@ Two software (TelomereHunter and TelSeq) were applied to estimate telomere lengt
 ### TelomereHunter
 
 - [paper](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2851-0)
-- [The software and documentation](https://www.dkfz.de/en/applied-bioinformatics/telomerehunter/telomerehunter.html)
+- [software and documentation](https://www.dkfz.de/en/applied-bioinformatics/telomerehunter/telomerehunter.html)
 - Telomere content was quantified using TelomereHunter using ten telomere variant repeats including TCAGGG, TGAGGG, TTGGGG, TTCGGG, TTTGGG, ATAGGG, CATGGG, CTAGGG, GTAGGG and TAAGGG.
 
 ### TelSeq
@@ -28,5 +28,5 @@ Two software (TelomereHunter and TelSeq) were applied to estimate telomere lengt
 
 ## Example correlation plot
 
-- results from TelomereHunter and TelSeq have high correlation  
+- results from TelomereHunter and TelSeq had a high correlation  
   ![an example correlation plot generated from step 4](./corr_plot.png)
