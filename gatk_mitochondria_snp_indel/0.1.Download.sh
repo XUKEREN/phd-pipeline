@@ -1,0 +1,59 @@
+gsutil -m cp \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.dict" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.fasta" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.fasta.amb" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.fasta.ann" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.fasta.bwt" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.fasta.fai" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.fasta.pac" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.fasta.sa" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.dict" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.fasta" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.fasta.amb" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.fasta.ann" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.fasta.bwt" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.fasta.fai" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.fasta.pac" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.fasta.sa" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/README" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/ShiftBack.chain" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/blacklist_sites.hg38.chrM.bed" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/blacklist_sites.hg38.chrM.bed.idx" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/blacklist_sites.hg38.chrM.shifted_by_8000_bases.bed.idx.old" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/blacklist_sites.hg38.chrM.shifted_by_8000_bases.bed.old" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/blacklist_sites.hg38.chrM.shifted_by_8000_bases.fixed.bed" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/blacklist_sites.hg38.chrM.shifted_by_8000_bases.fixed.bed.idx" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/chrM.hg38.interval_list" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/chrMWithFinalNuMTs.hg38.interval_list" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/control_region_shifted.chrM.interval_list" \
+  "gs://gcp-public-data--broad-references/hg38/v0/chrM/non_control_region.chrM.interval_list" \
+  .
+
+{
+  "MitochondriaPipeline.wgs_aligned_input_bam_or_cram": "input_bam_here",
+  "MitochondriaPipeline.wgs_aligned_input_bam_or_cram_index": "input_bam_index_here",
+  "MitochondriaPipeline.ref_fasta": "gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta",
+  "MitochondriaPipeline.ref_dict": "gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.dict",
+  "MitochondriaPipeline.ref_fasta_index": "gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta.fai",
+  "MitochondriaPipeline.mt_dict": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.dict",
+  "MitochondriaPipeline.mt_fasta": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.fasta",
+  "MitochondriaPipeline.mt_fasta_index": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.fasta.fai",
+  "MitochondriaPipeline.mt_amb": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.fasta.amb",
+  "MitochondriaPipeline.mt_ann": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.fasta.ann",
+  "MitochondriaPipeline.mt_bwt": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.fasta.bwt",
+  "MitochondriaPipeline.mt_pac": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.fasta.pac",
+  "MitochondriaPipeline.mt_sa": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.fasta.sa",
+  "MitochondriaPipeline.blacklisted_sites": "gs://gcp-public-data--broad-references/hg38/v0/chrM/blacklist_sites.hg38.chrM.bed",
+  "MitochondriaPipeline.blacklisted_sites_index": "gs://gcp-public-data--broad-references/hg38/v0/chrM/blacklist_sites.hg38.chrM.bed.idx",
+  "MitochondriaPipeline.mt_shifted_dict": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.dict",
+  "MitochondriaPipeline.mt_shifted_fasta": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.fasta",
+  "MitochondriaPipeline.mt_shifted_fasta_index": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.fasta.fai",
+  "MitochondriaPipeline.mt_shifted_amb": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.fasta.amb",
+  "MitochondriaPipeline.mt_shifted_ann": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.fasta.ann",
+  "MitochondriaPipeline.mt_shifted_bwt": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.fasta.bwt",
+  "MitochondriaPipeline.mt_shifted_pac": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.fasta.pac",
+  "MitochondriaPipeline.mt_shifted_sa": "gs://gcp-public-data--broad-references/hg38/v0/chrM/Homo_sapiens_assembly38.chrM.shifted_by_8000_bases.fasta.sa",
+  "MitochondriaPipeline.shift_back_chain": "gs://gcp-public-data--broad-references/hg38/v0/chrM/ShiftBack.chain",
+  "MitochondriaPipeline.control_region_shifted_reference_interval_list": "gs://gcp-public-data--broad-references/hg38/v0/chrM/control_region_shifted.chrM.interval_list",
+  "MitochondriaPipeline.non_control_region_interval_list": "gs://gcp-public-data--broad-references/hg38/v0/chrM/non_control_region.chrM.interval_list"
+}
