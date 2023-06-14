@@ -32,7 +32,7 @@ This is an HPC workflow to call SNPs and INDELs in the mitochondrial genome from
 - [3.3.LiftoverAndCombineVcfs.Tumor.sh](./3.3.LiftoverAndCombineVcfs.Tumor.sh)
 - [3.4.MergeStats.Tumor.sh](./3.4.MergeStats.Tumor.sh)
 - [3.5.InitialFilter.Tumor.sh](./3.5.InitialFilter.Tumor.sh)
-- [3.6.SplitMultiAllelicsAndRemoveNonPassSites.sh](/3.6.SplitMultiAllelicsAndRemoveNonPassSites.sh)
+- [3.6.SplitMultiAllelicsAndRemoveNonPassSites.sh](./3.6.SplitMultiAllelicsAndRemoveNonPassSites.sh)
 
 ## Step 4: Estimate levels of contamination in mitochondria
 
