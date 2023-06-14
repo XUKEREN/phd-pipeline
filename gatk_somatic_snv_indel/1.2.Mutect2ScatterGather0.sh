@@ -38,10 +38,10 @@ srun gatk --java-options "-Xms55G -Djava.io.tmpdir=/scratch2/kerenxu/tmp" \
     -I $tumor_bam \
     -I $normal_bam \
     -normal $base \
-    --germline-resource $gnomad
-# --genotype-germline-sites true \ # arguments for downstream BAF input
-# --genotype-pon-sites true \
--pon $pon \
+    --germline-resource $gnomad \
+    # --genotype-germline-sites true \ # arguments for downstream BAF input
+    # --genotype-pon-sites true \
+    -pon $pon \
     -L $interval_list \
     -O /dir/kerenxu/teeth/mutect2_out/scatter0/$output_vcf \
     --bam-output /dir/kerenxu/teeth/mutect2_out/scatter0/$output_bam \
