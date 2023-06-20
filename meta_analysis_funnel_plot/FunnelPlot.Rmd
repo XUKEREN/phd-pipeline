@@ -1,0 +1,76 @@
+---
+title: "funnel_plot"
+author: "KerenXu"
+date: "6/14/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(tidymeta)
+library(tidyverse)
+library(data.table)
+library(haven)
+
+```
+
+# read dataset
+```{r}
+data <- read_dta("Funnel_plot_A1C.dta")
+data2 <- read_dta("Funnel_plot_FBG.dta")
+```
+
+# clean dataset 
+```{r}
+a1c <- data %>% filter(!is.na(`_meta_es`)) %>% filter(intervention!="") %>% meta_analysis(yi = `_meta_es`, sei = `_meta_se`, slab = intervention)
+a1c_cleaned <- a1c %>% separate(study, c("intervention", "junk"), "\\.", remove = F) 
+
+a1c_cleaned %>% count(intervention) %>% pull(intervention) %>% dput()
+
+a1c_cleaned$intervention <- factor(a1c_cleaned$intervention, levels = c("mbsr", "meditation",  "qigong", "yoga", "Overall"))
+
+a1c_cleaned <- a1c_cleaned %>% mutate(intervention = case_when(
+  intervention == "mbsr" ~ "MBSR",
+  intervention == "meditation" ~ "Meditation",
+  intervention == "qigong" ~ "Qigong",
+  intervention == "yoga" ~ "Yoga",
+  intervention == "Overall" ~ "Overall"
+))
+
+fbg <- data2 %>% filter(!is.na(`_meta_es`)) %>% filter(intervention!="") %>% filter(!is.na(intervention)) %>% meta_analysis(yi = `_meta_es`, sei = `_meta_se`, slab = intervention)
+fbg_cleaned <- fbg %>% separate(study, c("intervention", "junk"), "\\.", remove = F) 
+
+fbg_cleaned %>% count(intervention) %>% pull(intervention) %>% dput()
+
+fbg_cleaned$intervention <- factor(fbg_cleaned$intervention, levels = c("guided imagery", "mbsr", "meditation", "yoga", "Overall"))
+
+fbg_cleaned <- fbg_cleaned %>% mutate(intervention = case_when(
+  intervention == "mbsr" ~ "MBSR",
+  intervention == "meditation" ~ "Meditation",
+  intervention == "guided imagery" ~ "Guided imagery",
+  intervention == "yoga" ~ "Yoga",
+  intervention == "Overall" ~ "Overall"
+))
+
+```
+
+# plot
+```{r}
+plot_a1c <- a1c_cleaned %>% ggplot(aes(x = estimate, y = std.error)) +
+  geom_point(aes(shape = intervention, color = intervention), size = 3, data =a1c_cleaned %>% filter(study!="Overall")) +  geom_vline(xintercept = 0, size = 0.8, color = "grey", linetype = "twodash") + 
+  geom_funnel(aes(summary = pull_summary(a1c_cleaned))) +
+  scale_y_reverse() + guides(shape = guide_legend(title = " "), color = guide_legend(title = " ")) + theme_minimal() +
+  scale_shape_manual(values=c(15, 18, 17, 16)) +
+  scale_color_manual(values=c( "#00A08A", "#F98400", "#5BBCD6", "#FF0000")) + xlab("Change in HbA1C (%)") + ylab("Standard error")
+ggsave(file="a1c.eps", width = 8, height = 6)
+
+plot_fbg  <- fbg_cleaned %>% ggplot(aes(x = estimate, y = std.error)) +
+  geom_point(aes(shape = intervention, color = intervention), size = 3, data =fbg_cleaned %>% filter(study!="Overall")) +  geom_vline(xintercept = 0, size = 0.8, color = "grey", linetype = "twodash") + 
+  geom_funnel(aes(summary = pull_summary(fbg_cleaned))) +
+  scale_y_reverse() + guides(shape = guide_legend(title = " "), color = guide_legend(title = " ")) + theme_minimal() +
+  scale_shape_manual(values=c(17, 15, 18, 16)) +
+  scale_color_manual(values=c("#5BBCD6",  "#00A08A", "#F98400", "#FF0000")) + xlab("Change in FBG (mg/dl)") + ylab("Standard error")
+ggsave(file="fbg.eps", width = 8, height = 6)
+```
+
