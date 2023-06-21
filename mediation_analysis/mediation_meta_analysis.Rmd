@@ -1,0 +1,216 @@
+---
+title: "meta_analysis_mediation"
+author: "Keren Xu"
+date: "12/22/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(data.table)
+library(tidyverse)
+library(metafor)
+library(boot)
+library(tidymeta)
+library(broom)
+library(knitr)
+library(gt)
+
+# read file path
+all_paths <- list.files(pattern = "med.out_*meta234",full.names = TRUE)
+ 
+# read file content
+all_content <-
+  all_paths %>%
+  lapply(read_rds)
+ 
+# read file name
+all_filenames <- all_paths %>%
+  basename() %>%
+  as.list()
+ 
+# combine file content list and file name list
+all_lists <- mapply(c, all_content, all_filenames, SIMPLIFY = FALSE)
+ 
+# unlist all lists and change column name
+all_result <- rbindlist(all_lists, fill = T)
+```
+
+
+# meta 234 
+```{r}
+# read file path
+all_paths <- list.files(pattern = "med.out*",full.names = TRUE)
+ 
+med.out_set2_meta234_rs78396808_cg16499656 <- read_rds("./med.out_set2_meta234_rs78396808_cg16499656.rds")
+med.out_set3_meta234_rs78396808_cg16499656 <- read_rds("./med.out_set3_meta234_rs78396808_cg16499656.rds")
+med.out_set4_meta234_rs78396808_cg16499656 <- read_rds("./med.out_set4_meta234_rs78396808_cg16499656.rds")
+```
+
+
+
+```{r}
+vector1 <- c(med.out_set2_meta234_rs78396808_cg16499656$tau.coef, sd(med.out_set2_meta234_rs78396808_cg16499656$tau.sims)^2, med.out_set2_meta234_rs78396808_cg16499656$d.avg, sd(med.out_set2_meta234_rs78396808_cg16499656$d.avg.sims)^2,med.out_set2_meta234_rs78396808_cg16499656$z.avg, sd(med.out_set2_meta234_rs78396808_cg16499656$z.avg.sims)^2, med.out_set2_meta234_rs78396808_cg16499656$n.avg, sd(med.out_set2_meta234_rs78396808_cg16499656$n.avg.sims)^2)
+
+vector2 <- c(med.out_set3_meta234_rs78396808_cg16499656$tau.coef, sd(med.out_set3_meta234_rs78396808_cg16499656$tau.sims)^2, med.out_set3_meta234_rs78396808_cg16499656$d.avg, sd(med.out_set3_meta234_rs78396808_cg16499656$d.avg.sims)^2,med.out_set3_meta234_rs78396808_cg16499656$z.avg, sd(med.out_set3_meta234_rs78396808_cg16499656$z.avg.sims)^2, med.out_set3_meta234_rs78396808_cg16499656$n.avg, sd(med.out_set3_meta234_rs78396808_cg16499656$n.avg.sims)^2)
+
+vector3 <- c(med.out_set4_meta234_rs78396808_cg16499656$tau.coef, sd(med.out_set4_meta234_rs78396808_cg16499656$tau.sims)^2, med.out_set4_meta234_rs78396808_cg16499656$d.avg, sd(med.out_set4_meta234_rs78396808_cg16499656$d.avg.sims)^2,med.out_set4_meta234_rs78396808_cg16499656$z.avg, sd(med.out_set4_meta234_rs78396808_cg16499656$z.avg.sims)^2, med.out_set4_meta234_rs78396808_cg16499656$n.avg, sd(med.out_set4_meta234_rs78396808_cg16499656$n.avg.sims)^2)
+
+mydata <- rbind(vector1, vector2, vector3) %>% data.frame()
+
+colnames(mydata) <- c("yi_total", "vi_total", "yi_ACME", "vi_ACME", "yi_ADE", "vi_ADE", "yi_prop.mediated", "vi_prop.mediated")
+
+mydata$set <- c("set2", "set3", "set4")
+
+mydata$pair <- c("rs78396808_cg16499656","rs78396808_cg16499656","rs78396808_cg16499656")
+
+mydata_long <- mydata %>%
+  pivot_longer(yi_total:vi_prop.mediated,
+  names_to = c(".value", "effect"),
+  names_pattern = "(.+)_(.+)"
+  )
+
+fwrite(mydata_long, "mydata_long_meta234.txt")
+```
+
+
+# total effect 
+
+Non-Parametric Bootstrapping
+For the non-parametric bootstrap method, we only need to define one function with two arguments, one for the original data and one for a vector of indices which define the bootstrap sample. The function again returns the statistics of interest (and the corresponding variances):
+
+```{r}
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "total")
+v1 <- rma.uni(yi, vi, data=dat, method = "FE") %>% tidy() %>% as_tibble()
+
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "ACME")
+v2 <- rma.uni(yi, vi, data=dat, method = "FE") %>% tidy() %>% as_tibble()
+
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "ADE")
+v3 <- rma.uni(yi, vi, data=dat, method = "FE") %>% tidy() %>% as_tibble()
+
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "prop.mediated")
+v4 <- rma.uni(yi, vi, data=dat, method = "FE") %>% tidy() %>% as_tibble()
+
+meta_result <- rbind(v1, v2, v3 ) %>% data.frame()
+meta_result$effect <- c("total", "ACME", "ADE")
+meta_result %>% gt()
+
+meta_result -> meta_result_rs78396808_cg16499656
+
+meta_result_rs78396808_cg16499656$pair <- "rs78396808_cg16499656"
+
+rbind(meta_result_rs78396808_cg16499656) %>% fwrite("mediation_table_meta234.csv")
+```
+
+
+```{r}
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "total")
+v1 <- rma.uni(yi, vi, data=dat, method = "FE") %>% glance() %>% select(p.value.cochran.qe, i.squared) %>% as_tibble()
+
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "ACME")
+v2 <- rma.uni(yi, vi, data=dat, method = "FE") %>% glance() %>% select(p.value.cochran.qe, i.squared) %>% as_tibble()
+
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "ADE")
+v3 <- rma.uni(yi, vi, data=dat, method = "FE") %>% glance() %>% select(p.value.cochran.qe, i.squared) %>% as_tibble()
+
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "prop.mediated")
+v4 <- rma.uni(yi, vi, data=dat, method = "FE") %>% glance() %>% select(p.value.cochran.qe, i.squared)%>% as_tibble()
+
+meta_result <- rbind(v1, v2, v3 ) %>% data.frame()
+meta_result$effect <- c("total", "ACME", "ADE")
+meta_result %>% gt()
+
+meta_result -> meta_result_rs78396808_cg16499656
+
+meta_result_rs78396808_cg16499656$pair <- "rs78396808_cg16499656"
+
+rbind(meta_result_rs78396808_cg16499656) %>% fwrite("mediation_table_meta234_p_het.csv")
+```
+
+# meta34
+```{r}
+# read file path
+all_paths <- list.files(pattern = "med.out_set3_meta34*",full.names = TRUE)
+
+med.out_set3_meta34_rs78396808_cg16499656 <- read_rds("./med.out_set3_meta34_rs78396808_cg16499656.rds")
+med.out_set4_meta34_rs78396808_cg16499656 <- read_rds("./med.out_set4_meta34_rs78396808_cg16499656.rds")
+```
+
+
+
+```{r}
+vector1 <- c(med.out_set3_meta34_rs78396808_cg16499656$tau.coef, sd(med.out_set3_meta34_rs78396808_cg16499656$tau.sims)^2, med.out_set3_meta34_rs78396808_cg16499656$d.avg, sd(med.out_set3_meta34_rs78396808_cg16499656$d.avg.sims)^2,med.out_set3_meta34_rs78396808_cg16499656$z.avg, sd(med.out_set3_meta34_rs78396808_cg16499656$z.avg.sims)^2, med.out_set3_meta34_rs78396808_cg16499656$n.avg, sd(med.out_set3_meta34_rs78396808_cg16499656$n.avg.sims)^2)
+
+vector2 <- c(med.out_set4_meta34_rs78396808_cg16499656$tau.coef, sd(med.out_set4_meta34_rs78396808_cg16499656$tau.sims)^2, med.out_set4_meta34_rs78396808_cg16499656$d.avg, sd(med.out_set4_meta34_rs78396808_cg16499656$d.avg.sims)^2,med.out_set4_meta34_rs78396808_cg16499656$z.avg, sd(med.out_set4_meta34_rs78396808_cg16499656$z.avg.sims)^2, med.out_set4_meta34_rs78396808_cg16499656$n.avg, sd(med.out_set4_meta34_rs78396808_cg16499656$n.avg.sims)^2)
+
+
+mydata <- rbind(vector1, vector2) %>% data.frame()
+
+colnames(mydata) <- c("yi_total", "vi_total", "yi_ACME", "vi_ACME", "yi_ADE", "vi_ADE", "yi_prop.mediated", "vi_prop.mediated")
+
+mydata$set <- c("set3", "set4")
+
+mydata$pair <- c("rs78396808_cg16499656","rs78396808_cg16499656")
+
+mydata_long <- mydata %>%
+  pivot_longer(yi_total:vi_prop.mediated,
+  names_to = c(".value", "effect"),
+  names_pattern = "(.+)_(.+)"
+  )
+
+fwrite(mydata_long, "mydata_long_meta34.txt")
+
+```
+
+
+```{r}
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "total")
+v1 <- rma.uni(yi, vi, data=dat, method = "FE") %>% tidy() %>% as_tibble()
+
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "ACME")
+v2 <- rma.uni(yi, vi, data=dat, method = "FE") %>% tidy() %>% as_tibble()
+
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "ADE")
+v3 <- rma.uni(yi, vi, data=dat, method = "FE") %>% tidy() %>% as_tibble()
+
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "prop.mediated")
+v4 <- rma.uni(yi, vi, data=dat, method = "FE") %>% tidy() %>% as_tibble()
+
+meta_result <- rbind(v1, v2, v3 ) %>% data.frame()
+meta_result$effect <- c("total", "ACME", "ADE")
+meta_result %>% gt()
+meta_result -> meta_result_rs78396808_cg16499656
+
+meta_result_rs78396808_cg16499656$pair <- "rs78396808_cg16499656"
+
+meta_result_rs78396808_cg16499656 %>% fwrite("mediation_table_meta34.csv")
+
+```
+
+
+
+```{r}
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "total")
+v1 <- rma.uni(yi, vi, data=dat, method = "FE") %>% glance() %>% select(p.value.cochran.qe, i.squared) %>% as_tibble()
+
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "ACME")
+v2 <- rma.uni(yi, vi, data=dat, method = "FE") %>% glance() %>% select(p.value.cochran.qe, i.squared) %>% as_tibble()
+
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "ADE")
+v3 <- rma.uni(yi, vi, data=dat, method = "FE") %>% glance() %>% select(p.value.cochran.qe, i.squared) %>% as_tibble()
+
+dat <- mydata_long %>% filter(pair == "rs78396808_cg16499656"& effect == "prop.mediated")
+v4 <- rma.uni(yi, vi, data=dat, method = "FE") %>% glance() %>% select(p.value.cochran.qe, i.squared) %>% as_tibble()
+
+meta_result <- rbind(v1, v2, v3 ) %>% data.frame()
+meta_result$effect <- c("total", "ACME", "ADE")
+meta_result %>% gt()
+meta_result -> meta_result_rs78396808_cg16499656
+
+meta_result_rs78396808_cg16499656$pair <- "rs78396808_cg16499656"
+meta_result_rs78396808_cg16499656 %>% fwrite("mediation_table_meta34_p_het.csv")
+```
