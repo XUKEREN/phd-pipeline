@@ -7,9 +7,11 @@ Welcome to phd-pipeline's documentation!
 ========================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
+   index
+   phd-pipeline
 
 
 Indices and tables
