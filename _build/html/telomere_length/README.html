@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>A workflow to estimate telomere length from matched tumor normal whole genome sequencing data (BAMs) &#8212; phd-pipeline 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="a-workflow-to-estimate-telomere-length-from-matched-tumor-normal-whole-genome-sequencing-data-bams">
+<h1>A workflow to estimate telomere length from matched tumor normal whole genome sequencing data (BAMs)<a class="headerlink" href="#a-workflow-to-estimate-telomere-length-from-matched-tumor-normal-whole-genome-sequencing-data-bams" title="Permalink to this heading">¶</a></h1>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Permalink to this heading">¶</a></h2>
+<p>A workflow to estimate telomere length from matched tumor-normal whole genome sequencing (WGS) data from 25 childhood acute lymphoblastic leukemia cases. WGS data were from Illumina NovaSeq 6000 Sequencing.</p>
+<p>Two software (TelomereHunter and TelSeq) were applied to estimate telomere length from matched tumor normal WGS data (BAMs) (processed by GATK Data pre-processing for variant discovery pipeline). A correlation plot was generated to compare the results from the two software.</p>
+<section id="telomerehunter">
+<h3>TelomereHunter<a class="headerlink" href="#telomerehunter" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2851-0">paper</a></p></li>
+<li><p><a class="reference external" href="https://www.dkfz.de/en/applied-bioinformatics/telomerehunter/telomerehunter.html">software and documentation</a></p></li>
+<li><p>Telomere content was quantified using TelomereHunter using ten telomere variant repeats including TCAGGG, TGAGGG, TTGGGG, TTCGGG, TTTGGG, ATAGGG, CATGGG, CTAGGG, GTAGGG and TAAGGG.</p></li>
+</ul>
+</section>
+<section id="telseq">
+<h3>TelSeq<a class="headerlink" href="#telseq" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://academic.oup.com/nar/article/42/9/e75/1249448">paper</a></p></li>
+<li><p><a class="reference external" href="https://github.com/zd1/telseq">github</a></p></li>
+<li><p>TL wsa estimated in kb using TelSeq. 7 was used as the threshold for the number of TTAGGG/CCCTAA repeats in a read for the read to be considered telomeric.</p></li>
+</ul>
+</section>
+</section>
+<section id="workflow">
+<h2>Workflow<a class="headerlink" href="#workflow" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>step 1: <a class="reference download internal" download="" href="../_downloads/a45fff0bf649cf24a3a31700b6086972/01.TelomereHunter.sh"><span class="xref download myst">run TelomereHunter</span></a></p></li>
+<li><p>step 2: <a class="reference download internal" download="" href="../_downloads/f7c8866dc7ced115602158883f24062c/02.TelSeq.sh"><span class="xref download myst">run TelSeq</span></a></p></li>
+<li><p>step 3: <a class="reference download internal" download="" href="../_downloads/ba63df4ce27806426e030b819f9e2a2b/03.agg_individual_reports.sh"><span class="xref download myst">aggregate outputs from individual bam files</span></a></p></li>
+<li><p>step 4: <a class="reference download internal" download="" href="../_downloads/be11fa8c891af38306b5158a973f8802/04.summary.R"><span class="xref download myst">clean aggregated tables and generate final outputs</span></a></p>
+<ul>
+<li><p>for telseq, to calculate TL for each sample, we need to take a weighted average of all the read groups within each sample: https://github.com/zd1/telseq/issues/1</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="example-correlation-plot">
+<h2>Example correlation plot<a class="headerlink" href="#example-correlation-plot" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>results from TelomereHunter and TelSeq had a high correlation (an example correlation plot generated from step 4)</p></li>
+</ul>
+<p align="center">
+<img src='corr_plot.png' width='500'>
+</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">phd-pipeline</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">phd-pipeline</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Keren Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="../_sources/telomere_length/README.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

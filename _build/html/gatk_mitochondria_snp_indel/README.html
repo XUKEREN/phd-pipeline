@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>GATK4 mitochondria SNPs and INDELs pipeline &#8212; phd-pipeline 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="gatk4-mitochondria-snps-and-indels-pipeline">
+<h1>GATK4 mitochondria SNPs and INDELs pipeline<a class="headerlink" href="#gatk4-mitochondria-snps-and-indels-pipeline" title="Permalink to this heading">¶</a></h1>
+<p>This is an HPC workflow to call SNPs and INDELs in the mitochondrial genome from matched tumor-normal whole genome sequencing (WGS) data from 25 childhood acute lymphoblastic leukemia cases. This workflow is largely based on <a class="reference external" href="https://github.com/broadinstitute/gatk/blob/master/scripts/mitochondria_m2_wdl/MitochondriaPipeline.wdl">GATK’s best practice WDL</a>. Check out <a class="reference external" href="https://github.com/broadinstitute/gatk-docs/blob/master/blog-2012-to-2019/2019-03-05-New!_Mitochondrial_Analysis_with_Mutect2.md?id=23598">GATK’s doc</a> for more details.</p>
+<section id="step-0-download-gatk-s-public-reference-databases">
+<h2>Step 0: Download GATK’s public reference databases<a class="headerlink" href="#step-0-download-gatk-s-public-reference-databases" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/3b9c8c897b77d932c967ec2c1606d9ef/0.1.Download.sh"><span class="xref download myst">0.1.Download.sh</span></a></p></li>
+</ul>
+</section>
+<section id="step-1-subset-a-whole-genome-bam-to-just-mitochondria-reads-and-remove-alignment-information">
+<h2>Step 1: Subset a whole genome bam to just Mitochondria reads and remove alignment information<a class="headerlink" href="#step-1-subset-a-whole-genome-bam-to-just-mitochondria-reads-and-remove-alignment-information" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/7f7df36bb1fe9eed267f972836655c78/1.1.SubsetBamToChrM.sh"><span class="xref download myst">1.1.SubsetBamToChrM.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/3bdaaee900ecfb6a183719730c6c312a/1.2.RevertSam.sh"><span class="xref download myst">1.2.RevertSam.sh</span></a></p></li>
+</ul>
+</section>
+<section id="step-2-align-unmapped-bam-mark-duplicates-collect-coverage-information-and-call-snps-and-indels-from-normal-bams">
+<h2>Step 2: Align unmapped bam, mark duplicates, collect coverage information, and call SNPs and INDELs from normal bams<a class="headerlink" href="#step-2-align-unmapped-bam-mark-duplicates-collect-coverage-information-and-call-snps-and-indels-from-normal-bams" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/29c526c3fbb59075c12fdb29bd184c9c/2.1.AlignToMt.sh"><span class="xref download myst">2.1.AlignToMt.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/fc7cddd2f0f4b8f55cc054e6cd0738c8/2.2.AlignToShiftedMt.sh"><span class="xref download myst">2.2.AlignToShiftedMt.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/c5bd9a0de21980299e64101b273b7288/2.3.1.CollectWgsMetrics.sh"><span class="xref download myst">2.3.1.CollectWgsMetrics.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/a12578c54b06a207c16f53f3bf547829/2.3.2.CollectWgsMetrics.R"><span class="xref download myst">2.3.2.CollectWgsMetrics.R</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/90b5e9aafcefcb5e7a0a41437797ac2a/2.3.3.RunCollectWgsMetricsR.sh"><span class="xref download myst">2.3.3.RunCollectWgsMetricsR.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/a03184b8ecc10dafed8f80595ab12cd1/2.4.CallMt.Germline.sh"><span class="xref download myst">2.4.CallMt.Germline.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/dc79b89f65b7c1b5bdc86d691c98cfdc/2.5.CallShiftedMt.Germline.sh"><span class="xref download myst">2.5.CallShiftedMt.Germline.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/0fff000c79100188ea2dc323e616570d/2.6.LiftoverAndCombineVcfs.sh"><span class="xref download myst">2.6.LiftoverAndCombineVcfs.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/c2f090fcfca6276140ddfbee84f001b5/2.7.MergeStats.sh"><span class="xref download myst">2.7.MergeStats.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/c81804a4b1f322d5ad41ea646d098149/2.8.InitialFilter.sh"><span class="xref download myst">2.8.InitialFilter.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/987523ca8780c3f0f4c6c099229d04b4/2.9.SplitMultiAllelicsAndRemoveNonPassSites.sh"><span class="xref download myst">2.9.SplitMultiAllelicsAndRemoveNonPassSites.sh</span></a></p></li>
+</ul>
+</section>
+<section id="step-3-call-snps-and-indels-from-tumor-bams">
+<h2>Step 3: Call SNPs and INDELs from tumor bams<a class="headerlink" href="#step-3-call-snps-and-indels-from-tumor-bams" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/a4fdbcd9b8595dbc5d72ba8b8ca40df5/3.1.CallMt.Tumor.sh"><span class="xref download myst">3.1.CallMt.Tumor.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/ff86fbd924899011a880b5d277bc3569/3.2.CallShiftedMt.Tumor.sh"><span class="xref download myst">3.2.CallShiftedMt.Tumor.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/5161dfff3cd83a16cdece9c6b05a5ae4/3.3.LiftoverAndCombineVcfs.Tumor.sh"><span class="xref download myst">3.3.LiftoverAndCombineVcfs.Tumor.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/e467cda7951e09dcafc01e27a1932523/3.4.MergeStats.Tumor.sh"><span class="xref download myst">3.4.MergeStats.Tumor.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/d0748268850d878b81184a532657e778/3.5.InitialFilter.Tumor.sh"><span class="xref download myst">3.5.InitialFilter.Tumor.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/7f727a82374ec25f43d668cb00cf407f/3.6.SplitMultiAllelicsAndRemoveNonPassSites.sh"><span class="xref download myst">3.6.SplitMultiAllelicsAndRemoveNonPassSites.sh</span></a></p></li>
+</ul>
+</section>
+<section id="step-4-estimate-levels-of-contamination-in-mitochondria">
+<h2>Step 4: Estimate levels of contamination in mitochondria<a class="headerlink" href="#step-4-estimate-levels-of-contamination-in-mitochondria" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/55089db83712f6d1e76d4a1a18c0daa8/4.1.GetContamination.sh"><span class="xref download myst">4.1.GetContamination.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/8534b7c0ffb0e3c13f53bc2f880080bb/4.2.FilterContamination.sh"><span class="xref download myst">4.2.FilterContamination.sh</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">phd-pipeline</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">phd-pipeline</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Keren Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="../_sources/gatk_mitochondria_snp_indel/README.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
