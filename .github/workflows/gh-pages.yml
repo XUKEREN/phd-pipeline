@@ -35,8 +35,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
+      - name: Install dependencies
+        run: python3 -m pip install -r ./docs/requirements.txt
+
       - name: Build HTML
-        uses: ammaraskar/sphinx-action@master
+        run: sphinx-build -b html docs docs/_build/html -j auto
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
