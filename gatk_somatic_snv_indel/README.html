@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>GATK4 call somatic snvs indels &#8212; phd-pipeline 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="tex2jax_ignore mathjax_ignore section" id="gatk4-call-somatic-snvs-indels">
+<h1>GATK4 call somatic snvs indels<a class="headerlink" href="#gatk4-call-somatic-snvs-indels" title="Permalink to this headline">¶</a></h1>
+<p>This is an HPC workflow for calling short mutations including single nucleotide (SNA) and insertion and deletion (indel) alterations from 50 matched tumor-normal whole genome sequencing (WGS) bams from 25 childhood acute lymphoblastic leukemia cases. WGS bams were preprocessed with this <span class="xref myst">workflow</span>.</p>
+<p>This workflow was written according to the following GATK official WDLs:</p>
+<ul class="simple">
+<li><p>https://github.com/gatk-workflows/gatk4-somatic-snvs-indels</p></li>
+<li><p>https://github.com/broadinstitute/gatk/tree/master/scripts/mutect2_wdl</p></li>
+</ul>
+<p>Check out gatk doc for more details on GATK4 Mutect2:</p>
+<ul>
+<li><p><a class="reference external" href="https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2">Detailed explanation of Mutect2</a></p></li>
+<li><p><a class="reference external" href="https://gatk.broadinstitute.org/hc/en-us/articles/360035889791?id=11136">Details on the deprecated pipeline</a></p></li>
+<li><p><a class="reference external" href="https://gatk.broadinstitute.org/hc/en-us/articles/360035531132">New pipeline</a></p></li>
+<li><p><a class="reference external" href="https://github.com/broadinstitute/gatk/blob/master/docs/mutect/mutect.pdf">Mutect2 PDF document</a></p></li>
+<li><p><a class="reference external" href="https://github.com/broadinstitute/gatk-docs/blob/master/blog-2012-to-2019/2019-01-31-New_Features_and_Improvements__in_Mutect2.md?id=23400">New features and improvements</a></p></li>
+<li><p><a class="reference external" href="https://gatk.broadinstitute.org/hc/en-us/articles/360035890491?id=11127">What traditional somatic calling entails</a></p></li>
+<li><p><a class="reference external" href="https://gatk.broadinstitute.org/hc/en-us/articles/360050722212-FAQ-for-Mutect2">FAQ for Mutect2</a></p>
+<ul class="simple">
+<li><p>How is the Mutect2 filter different in tumor-only mode, versus in matched-normal mode? What does it do differently in each case?</p></li>
+</ul>
+<blockquote>
+<div><p>In <em>tumor-normal</em> mode, Mutect2 detects germline variants using (1) the population allele frequency from the germline resource as a prior, (2) the normal reads, and (3) the allele fraction in the tumor (allele fractions near ½ are suggestive of germline hets). In <em>tumor-only</em> mode, the evidence from normal reads is missing, but it’s the same model. Additionally, in <em>tumor-only</em> mode, the powerful normal artifact filter is not available.
+<strong>Mutect2 uses the matched normal</strong> to additionally <strong>exclude rare germline variation</strong> not captured by the germline resource and individual-specific artifacts.
+<strong>Mutect2 uses a germline population resource</strong> towards evidence of alleles being germline. The simplified sites-only <a class="reference external" href="http://gnomad.broadinstitute.org/">gnomAD</a> resource retaining allele-specific frequencies is available at <a class="reference external" href="ftp://gsapubftp-anonymous&#64;ftp.broadinstitute.org/bundle/Mutect2">ftp://gsapubftp-anonymous&#64;ftp.broadinstitute.org/bundle/Mutect2</a>.
+<strong>A panel of normals (PoN)</strong> has a vital role that fills a gap between the matched normal and the population resource. Mutect2 uses the PoN to catch additional <strong>sites of noise in sequencing data</strong>, like mapping artifacts or other somewhat random but systematic artifacts of sequencing and data processing.</p>
+</div></blockquote>
+<p><em><a class="reference external" href="https://www.biostars.org/p/6368/">Interesting biostar post - How Do Heterozygotes And Somatic Mutations Manifest In Sequencing Projects</a></em></p>
+</li>
+<li><p><a class="reference external" href="https://gatk.broadinstitute.org/hc/en-us/articles/360047219031-CreateSomaticPanelOfNormals-BETA-">create PON</a></p>
+<ul class="simple">
+<li><p>Create a panel of normals (PoN) containing germline and artifactual sites for use with Mutect2.</p></li>
+<li><p>The tool takes multiple normal sample callsets produced by Mutect2’s tumor-only mode and collates sites present in multiple samples (two by default, set by the –min-sample-count argument) into a sites-only VCF. The PoN captures common artifacts. Mutect2 then uses the PoN to filter variants at the site-level. The –max-germline-probability argument sets the threshold for possible germline variants to be included in the PoN. By default this is set to 0.5, so that likely germline events are excluded. This is usually the correct behavior as germline variants are best handled by probabilistic modeling via Mutect2’s –germline-resource argument. A germline resource, such as gnomAD in the case of humans, is a much more refined tool for germline filtering than any PoN could be.</p></li>
+</ul>
+</li>
+<li><p>calculate contamination: the final table tells us the likely rate of cross-sample contamination in the tumor callset. If the level of contamination of the tumor is estimated at 1.15%, with an error of 0.19%, this means that one read out of every hundred is likely to come from someone else. This percentage will effectively be our floor for detecting low-frequency somatic events; for potential variant called at or below that AF, we would have zero power to judge whether they were real or created through contamination. We will feed the table into the filtering tool so that it can take the contamination estimate properly into account. (*explanation from GITC).</p></li>
+</ul>
+<div class="section" id="best-practices-for-somatic-short-variant-discovery-a-figure-from-gitc">
+<h2>Best practices for somatic short variant discovery. A figure from GITC.<a class="headerlink" href="#best-practices-for-somatic-short-variant-discovery-a-figure-from-gitc" title="Permalink to this headline">¶</a></h2>
+<p align="center">
+<img src='M2_workflow.png' width='400'>
+</p>
+</div>
+</div>
+<div class="tex2jax_ignore mathjax_ignore section" id="step-1-scatter-interval-for-mutect2-parallel-calling">
+<h1>Step 1: Scatter interval for Mutect2 parallel calling<a class="headerlink" href="#step-1-scatter-interval-for-mutect2-parallel-calling" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/6d91618fd28cdb832db3c4985d7e9618/1.1.ScatterInterval.sh"><span class="xref download myst">1.1.ScatterInterval.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/9006d0d192514540ecfd7e445be24f76/1.2.Mutect2ScatterGather0.sh"><span class="xref download myst">1.2.Mutect2ScatterGather0.sh</span></a></p></li>
+</ul>
+</div>
+<div class="tex2jax_ignore mathjax_ignore section" id="step-2-gather-results-from-scattered-intervals">
+<h1>Step 2: Gather results from scattered intervals<a class="headerlink" href="#step-2-gather-results-from-scattered-intervals" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/404c419e4d5ccd0e6bccfad178ccdf59/1.3.MergeVCFs.sh"><span class="xref download myst">1.3.MergeVCFs.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/d35bc219a98b30298689bf27ebb8064a/1.4.MergeBamOuts.sh"><span class="xref download myst">1.4.MergeBamOuts.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/9bcec011dc7bd0f2e1420840006824e6/1.5.MergeStats.sh"><span class="xref download myst">1.5.MergeStats.sh</span></a></p></li>
+</ul>
+</div>
+<div class="tex2jax_ignore mathjax_ignore section" id="step-3-calculate-contamination-and-learn-orientation-bias">
+<h1>Step 3: Calculate contamination and learn orientation bias<a class="headerlink" href="#step-3-calculate-contamination-and-learn-orientation-bias" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/dd0a2bed72254f3a72dd6926ea52ae0c/2.1.Contamination.sh"><span class="xref download myst">2.1.Contamination.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/ee070673407a2efe0f979254dd61661e/2.2.OrientationBias.sh"><span class="xref download myst">2.2.OrientationBias.sh</span></a></p></li>
+</ul>
+</div>
+<div class="tex2jax_ignore mathjax_ignore section" id="step-4-filter-alignment-artifacts">
+<h1>Step 4: Filter alignment artifacts<a class="headerlink" href="#step-4-filter-alignment-artifacts" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/fd7dd5755302066aeed81706d62f5e62/2.4.1.CreateBWAimage.sh"><span class="xref download myst">2.4.1.CreateBWAimage.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/8be3202d9f2d8e9e06983bf278d9f2b9/2.4.2.FilterAlignmentArtifacts.sh"><span class="xref download myst">2.4.2.FilterAlignmentArtifacts.sh</span></a></p></li>
+</ul>
+</div>
+<div class="tex2jax_ignore mathjax_ignore section" id="step-5-filter-variants">
+<h1>Step 5: Filter variants<a class="headerlink" href="#step-5-filter-variants" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/e4a8dee5ea2e637c625fcb814032caac/2.5.Funcotate.sh"><span class="xref download myst">2.5.Funcotate.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/c0d5eea8a1e8097505906701dfb964c5/2.6.BcftoolFilter.sh"><span class="xref download myst">2.6.BcftoolFilter.sh</span></a></p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">phd-pipeline</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">phd-pipeline</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Keren Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/gatk_somatic_snv_indel/README.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

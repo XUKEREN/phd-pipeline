@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Calling Structural Variations &#8212; phd-pipeline 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="tex2jax_ignore mathjax_ignore section" id="calling-structural-variations">
+<h1>Calling Structural Variations<a class="headerlink" href="#calling-structural-variations" title="Permalink to this headline">¶</a></h1>
+<p>This is an HPC pipeline for calling structural variations using three software from 76 matched tumor-normal whole genome sequencing (WGS) bams from 38 childhood acute lymphoblastic leukemia cases.</p>
+<div class="section" id="smoove-lumpy">
+<h2>Smoove (lumpy)<a class="headerlink" href="#smoove-lumpy" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/ff5e5800d545a5d298be51fac207d476/1.1.PreMergeSVPerSampleSmoove.sh"><span class="xref download myst">1.1.PreMergeSVPerSampleSmoove.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/91cbcd04fa8c28efa1bd11313376a4f3/1.2.SmooveUnionSites.sh"><span class="xref download myst">1.2.SmooveUnionSites.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/b3d78cf42c5f010eb8ba87e0328b183b/1.3.SmooveGenotype.sh"><span class="xref download myst">1.3.SmooveGenotype.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/890c7ab26bb9efdb2f74328aaa1d2eb6/1.4.SmoovePasteAnnotate.sh"><span class="xref download myst">1.4.SmoovePasteAnnotate.sh</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="manta">
+<h2>Manta<a class="headerlink" href="#manta" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/6762c03aaa2898df0c7d583e06750fa5/2.1.PreMergeSVPerSampleMantaconfigure.sh"><span class="xref download myst">2.1.PreMergeSVPerSampleMantaconfigure.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/36520cc93e58c52df4928a3e2f86140b/2.2.MantaWorkflow.sh"><span class="xref download myst">2.2.MantaWorkflow.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/318611e874774a075b23acf6fd7ba5cc/2.3.MantaClean.sh"><span class="xref download myst">2.3.MantaClean.sh</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="delly">
+<h2>Delly<a class="headerlink" href="#delly" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/0c38a6d185f0bf82ee85f20321c3d601/3.1.DellyPerSampleCall.sh"><span class="xref download myst">3.1.DellyPerSampleCall.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/1b65e2d99f3aa2b8ce04e00d68758525/3.2.DellyPrefilter.sh"><span class="xref download myst">3.2.DellyPrefilter.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/9097c57d3d32fc2c53d075b1cec9db24/3.3.DellyGeno.sh"><span class="xref download myst">3.3.DellyGeno.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/38b4e5c56daf1efa087764af74f8ce10/3.4.DellyPostfilter.sh"><span class="xref download myst">3.4.DellyPostfilter.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/64cebc2c558e0b2715ac538d45956ca3/3.5.DellyBcf2vcf.sh"><span class="xref download myst">3.5.DellyBcf2vcf.sh</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="finding-variants-that-were-called-by-at-least-2-callers">
+<h2>Finding variants that were called by at least 2 callers<a class="headerlink" href="#finding-variants-that-were-called-by-at-least-2-callers" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/c145428d53b3d5ee250537f81ddbd0b6/4.1.Survivor.sh"><span class="xref download myst">4.1.Survivor.sh</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="annotate-variants">
+<h2>Annotate variants<a class="headerlink" href="#annotate-variants" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/e5fbfbc558ba1ac65fe3e738c8ac4bf3/4.2.Anno.sh"><span class="xref download myst">4.2.Anno.sh</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="create-venn-diagram-histograms-and-html-files">
+<h2>Create Venn diagram, histograms and html files<a class="headerlink" href="#create-venn-diagram-histograms-and-html-files" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/c2b0dc098c6bf4003b1f37421a2d5692/4.3.Summary.sh"><span class="xref download myst">4.3.Summary.sh</span></a></p></li>
+</ul>
+<p>an example Venn graph:</p>
+<p align="center">
+<img src='venn.png' width='400'>
+</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">phd-pipeline</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">phd-pipeline</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Keren Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/sv/README.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

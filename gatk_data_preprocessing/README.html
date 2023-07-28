@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Data pre-processing for variant discovery GATK4 &#8212; phd-pipeline 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="tex2jax_ignore mathjax_ignore section" id="data-pre-processing-for-variant-discovery-gatk4">
+<h1>Data pre-processing for variant discovery GATK4<a class="headerlink" href="#data-pre-processing-for-variant-discovery-gatk4" title="Permalink to this headline">¶</a></h1>
+<p>An HPC workflow that pre-processes 50 matched tumor-normal whole genome sequencing (WGS) fastq files from 25 childhood acute lymphoblastic leukemia cases. WGS data were from Illumina NovaSeq 6000 Sequencing. Check out <a class="reference external" href="https://gatk.broadinstitute.org/hc/en-us/articles/360035535912-Data-pre-processing-for-variant-discovery">gatk doc</a> for more details.</p>
+<p>This workflow was written according to the following GATK official WDLs:</p>
+<ul class="simple">
+<li><p>Detailed versions:</p>
+<ul>
+<li><p>https://github.com/gatk-workflows/gatk4-genome-processing-pipeline/blob/master/tasks/UnmappedBamToAlignedBam.wdl</p></li>
+<li><p>https://github.com/gatk-workflows/gatk4-genome-processing-pipeline/blob/master/WholeGenomeGermlineSingleSample.wdl</p></li>
+</ul>
+</li>
+<li><p>Simple version:</p>
+<ul>
+<li><p>https://github.com/gatk-workflows/gatk4-data-processing/blob/master/processing-for-variant-discovery-gatk4.wdl</p></li>
+<li><p>Detailed documents for this simple version: https://github.com/broadgsa/gatk/blob/master/doc_archive/methods/Reference_implementation:_PairedEndSingleSampleWf_pipeline.md#SortAndFixTags</p></li>
+</ul>
+</li>
+<li><p>Other tutorials:</p>
+<ul>
+<li><p><a class="reference external" href="https://hpc.nih.gov/training/gatk_tutorial/bqsr.html">A practical introduction to GATK 4 on Biowulf (NIH HPC)</a></p></li>
+<li><p><a class="reference external" href="https://github.com/broadgsa/gatk/blob/master/doc_archive/tutorials/(howto)_Recalibrate_base_quality_scores_%3D_run_BQSR.md">(howto) Recalibrate base quality scores = run BQSR</a></p></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="the-main-steps-in-the-preprocessing-workflow-a-figure-from-gitc">
+<h2>The main steps in the preprocessing workflow. A figure from GITC.<a class="headerlink" href="#the-main-steps-in-the-preprocessing-workflow-a-figure-from-gitc" title="Permalink to this headline">¶</a></h2>
+<p align="center">
+<img src='MainStepsInPreprocessingWorkflow.png' width='250'>
+</p>
+</div>
+<div class="section" id="step-0-qc">
+<h2>Step 0: QC<a class="headerlink" href="#step-0-qc" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/56d316c73e7b12e6050e80588bca18af/0.1.Fastqc.sh"><span class="xref download myst">0.1.Fastqc.sh</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="step-1-fastqs-to-unmapped-bams">
+<h2>Step 1: Fastqs to Unmapped BAMs<a class="headerlink" href="#step-1-fastqs-to-unmapped-bams" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/b46aea83dd1701044fe60456e6a84c1c/1.1.PairedFastqToUnmappedBam.sh"><span class="xref download myst">1.1.PairedFastqToUnmappedBam.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/92ca7c195fc347928e0feadfc166b60a/1.2.ValidateSamFile.sh"><span class="xref download myst">1.2.ValidateSamFile.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/f8035ac3e59971270fdeb555c306bdf4/1.3.SortSam.sh"><span class="xref download myst">1.3.SortSam.sh</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="step-2-unmapped-bams-to-mapped-bams">
+<h2>Step 2: Unmapped BAMs to Mapped BAMs<a class="headerlink" href="#step-2-unmapped-bams-to-mapped-bams" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/ca4b005312338586688926cd214e88b9/2.1.Bwa.sh"><span class="xref download myst">2.1.Bwa.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/db7595df5856e4ca38e5e678cbe23a39/2.2.SortAlignedBam.sh"><span class="xref download myst">2.2.SortAlignedBam.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/356857112fc22b9af8219cf6ee04f15d/2.3.ValidateAlignedBam.sh"><span class="xref download myst">2.3.ValidateAlignedBam.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/829d405024b8f014d0b3dea3f7299b07/2.4.CheckIfAltAwareAlign.sh"><span class="xref download myst">2.4.CheckIfAltAwareAlign.sh</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="step-3-merge-unmapped-bams-and-mapped-bams">
+<h2>Step 3: Merge Unmapped BAMs and Mapped BAMs<a class="headerlink" href="#step-3-merge-unmapped-bams-and-mapped-bams" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/f73ffcf1d78b54b1745001032044c815/3.1.MergeBamAlignment.sh"><span class="xref download myst">3.1.MergeBamAlignment.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/4e09d86921c1f1ec848b555dcb4a850a/3.2.ValidateMergedBam.sh"><span class="xref download myst">3.2.ValidateMergedBam.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/68b8e598994f2cd5fca702866ebc1d92/3.3.CountReads.sh"><span class="xref download myst">3.3.CountReads.sh</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="step-4-markduplicates">
+<h2>Step 4: MarkDuplicates<a class="headerlink" href="#step-4-markduplicates" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/63f90a062dcd0b9730cb179b75cb18a4/4.1.MarkDuplicates.sh"><span class="xref download myst">4.1.MarkDuplicates.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/e6a9ae9c2cc189a5cbcfaab8aa19feac/4.2.SortAndFixTags.sh"><span class="xref download myst">4.2.SortAndFixTags.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/0a20d787265f8bc1be09e4249abac28a/4.3.ValidateSortedMarkedBam.sh"><span class="xref download myst">4.3.ValidateSortedMarkedBam.sh</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="step-5-base-quality-score-recalibration">
+<h2>Step 5: Base Quality Score Recalibration<a class="headerlink" href="#step-5-base-quality-score-recalibration" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/7a4739434faf6510d21e3116c7795e1e/5.1.BaseRecalibrator.sh"><span class="xref download myst">5.1.BaseRecalibrator.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/d5a3dc1bc5dd87382595185cd5ac5b90/5.2.BqsrPlot.sh"><span class="xref download myst">5.2.BqsrPlot.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/17f7a1e45137237d1138b4e904c0bb3e/5.3.BqsrPlot.Rmd"><span class="xref download myst">5.3.BqsrPlot.Rmd</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">phd-pipeline</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">phd-pipeline</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Keren Xu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/gatk_data_preprocessing/README.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
