@@ -30,7 +30,13 @@ extensions = [
 ]
 
 templates_path = ['_templates']
-exclude_patterns = ['./*/*.md']
+
+# List of patterns, relative to source directory, that match files and
+# directories to ignore when looking for source files.
+exclude_patterns = [
+    './*/*.md',
+    'README.md'
+]
 
 # The suffix of source filenames
 source_suffix = ['.rst', '.ipynb', '.md']

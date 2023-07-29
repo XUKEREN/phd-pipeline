@@ -1,4 +1,6 @@
-# phd-pipeline
+# phd-pipeline  
+
+Some workflows I wrote for my phd research projects:  
 
 - [CNV pipelines](./cnv/README.md)
 - [Epigenome-wide association study](./ewas)
