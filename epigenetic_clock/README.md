@@ -7,5 +7,5 @@ Two epigenetic clocks: DNA methylation-based estimators of age were calculated a
 Three epigenetic gestational age clocks (Bohlin et al., 2016; Haftorn et al., 2021; Knight et al., 2016): The Haftorn clock ([Haftorn et al., 2021](https://pubmed.ncbi.nlm.nih.gov/33875015/)) comprises 176 CpGs on the EPIC array. The Knight clock ([Knight et al., 2016](https://pubmed.ncbi.nlm.nih.gov/27717399/)) and the Bohlin clock ([Bohlin et al., 2016](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5054559/#MOESM1)) are composed of 148 CpGs and 96 CpGs from the 450K array, respectively. Six CpGs in the Knight clock and 8 CpGs in the Bohlin clock were absent from the EPIC array and were thus replaced with the average beta values of the 142 and 88 available clock CpGs, respectively, using the “impute.knn” function.
 
 - Study publication: [link](https://onlinelibrary.wiley.com/doi/full/10.1111/acel.13652)
-- A full list of CpGs and their weight can be found here: [link](https://github.com/XUKEREN/phd-pipeline/eigenetic_clock)
+- A full list of CpGs and their weight can be found here: [link](https://github.com/XUKEREN/phd-pipeline/tree/main/epigenetic_clock)
 - Script to calculate epigenetic clocks: [link](./epigenetic_clock.R)

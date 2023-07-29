@@ -12,7 +12,7 @@ Some workflows I wrote for my phd research projects:
 - [CNV pipelines](./cnv/README.md)
 - [Mutational signatures](./mutational_signatures/README.md)
 - [Telomere length estimation](./telomere_length/README.md)
-- [Eigenetic clock](./eigenetic_clock/README.md)
+- [Eigenetic clock](./epigenetic_clock/README.md)
 
 ## Association studies
 
@@ -22,7 +22,7 @@ Some workflows I wrote for my phd research projects:
 - [Causal mediation analysis](./mediation_analysis/README.md)
 - [Create summary stats table](./tableone/README.md)
 
-## Data visualization
+## Data visualizations
 
 - [Chord diagram](./data_visualization/chord_diagram/README.md)
 - [Correlation heatmap](./data_visualization/heatmap/README.md)
