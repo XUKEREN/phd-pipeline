@@ -1,0 +1,318 @@
+---
+title: "figures"
+author: "Keren Xu"
+date: "07/26/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(data.table)
+library(tidyverse)
+library(tidymeta)
+library(broom)
+library(knitr)
+library(ggpubr)
+library(patchwork)
+theme_set(theme_pubr())
+```
+
+
+```{r}
+set2_meta234 <- fread("set2_for_med_meta234.txt")  
+set3_meta234 <- fread("set3_for_med_meta234.txt")  
+set4_meta234 <- fread("set4_for_med_meta234.txt") 
+set3_meta34 <- fread("set3_for_med_meta34.txt")  
+set4_meta34 <- fread("set4_for_med_meta34.txt") 
+```
+
+
+# plot the DNA methylation at cg01139861 in subjects with 0, 1 and 2 copies of the SNP risk allele. Could plot in all subjects
+```{r, fig.width = 8, fig.height=5}
+rbind(
+  set2_meta234 %>% select(beadPosition, rs78396808, cg01139861, set),
+  set3_meta234 %>% select(beadPosition, rs78396808, cg01139861, set),
+  set4_meta234 %>% select(beadPosition, rs78396808, cg01139861, set)
+) -> df1
+
+
+df1  %>% mutate_at(c("rs78396808"), as.factor) %>% mutate(rs78396808 = case_when(
+  rs78396808 == "0" ~ "GG",
+  rs78396808 == "1" ~ "AG",
+  rs78396808 == "2" ~ "AA"
+)) %>% mutate(
+  set = case_when(
+    set == "set2" ~ "CCLS 450K",
+    set == "set3" ~ "CCRLP EPIC",
+    set == "set4" ~ "CCLS EPIC"
+  )
+) ->  df1
+
+p1 <- df1 %>% ggplot(aes(x = rs78396808, y = cg01139861)) + geom_dotplot(binaxis = "y", binwidth = 1/200, stackdir = "center", stackratio = 0.75, color = "grey40", fill = "grey40") + stat_summary(fun = "median", colour = "black", size = 3, geom = "point")  + facet_grid(cols = vars(`set`)) +  theme(legend.position = "none") +  labs(
+    title = "rs78396808, cg01139861",
+    y = "cg01139861"
+  ) + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 14, face = "bold"),
+    strip.text.x = element_text(angle = 0, size = 12, face = "bold", margin = margin(r= 0, unit = "cm")),
+    strip.placement = "outside",
+   axis.text = element_text(size = 14),
+   axis.title = element_text(size = 14),
+   strip.background = element_blank(),
+   panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank()) 
+```
+
+
+# plot the DNA methylation at cg01139861 by case control status
+```{r, fig.width = 6, fig.height=5}
+
+rbind(
+  set2_meta234 %>% select(beadPosition, CaCo, cg01139861, set),
+  set3_meta234 %>% select(beadPosition, CaCo, cg01139861, set),
+  set4_meta234 %>% select(beadPosition, CaCo, cg01139861, set)
+) -> df1
+
+
+df1 %>% mutate_at(c("CaCo"), as.factor) %>% mutate(CaCo = case_when(
+  CaCo == "0" ~ "Control",
+  CaCo == "1" ~ "Case"
+)) %>% mutate(
+  set = case_when(
+    set == "set2" ~ "CCLS 450K",
+    set == "set3" ~ "CCRLP EPIC",
+    set == "set4" ~ "CCLS EPIC"
+  )
+) ->  df1
+
+p2 <- df1 %>% ggplot(aes(x = CaCo, y = cg01139861)) + geom_dotplot(binaxis = "y", binwidth = 1/200, stackdir = "center", stackratio = 0.75, color = "grey40", fill = "grey40") + stat_summary(fun = "median", colour = "black", size = 3, geom = "point")  + facet_grid(cols = vars(`set`)) +  theme(legend.position = "none") +  labs(
+    title = "cg01139861, ALL case control",
+    y = "cg01139861",
+    x = "ALL case control status"
+  ) + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 14, face = "bold"),
+    strip.text.x = element_text(angle = 0, size = 12, face = "bold", margin = margin(r= 0, unit = "cm")),
+    strip.placement = "outside",
+   axis.text = element_text(size = 14),
+   axis.title = element_text(size = 14),
+   strip.background = element_blank(),
+   panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank()) 
+
+```
+
+
+# plot the DNA methylation at cg01139861 by case control
+```{r, fig.width = 6, fig.height=5, dev = 'CairoPNG'}
+
+rbind(
+  set2_meta234 %>% select(beadPosition, CaCo, rs78396808, set),
+  set3_meta234 %>% select(beadPosition, CaCo, rs78396808, set),
+  set4_meta234 %>% select(beadPosition, CaCo, rs78396808, set)
+) -> df1
+
+
+df1 %>% mutate_at(c("rs78396808"), as.factor) %>% mutate(rs78396808 = case_when(
+  rs78396808 == "0" ~ "GG",
+  rs78396808 == "1" ~ "AG",
+  rs78396808 == "2" ~ "AA"
+))  %>% mutate_at(c("CaCo"), as.factor) %>% mutate(CaCo = case_when(
+  CaCo == "0" ~ "Control",
+  CaCo == "1" ~ "Case"
+)) %>% mutate(
+  set = case_when(
+    set == "set2" ~ "CCLS 450K",
+    set == "set3" ~ "CCRLP EPIC",
+    set == "set4" ~ "CCLS EPIC"
+  )
+) ->  df1
+
+df1_all <- df1 %>% count(set, rs78396808) 
+df1_case <- df1 %>% filter(CaCo == "Case") %>% count(set, rs78396808) 
+df1_perc <- df1_all %>% left_join(df1_case, by = c("set", "rs78396808")) %>% mutate(per = n.y/n.x)
+
+p3 <-  df1_perc %>% ggplot(aes(y=per, x=rs78396808)) + 
+    geom_col(fill = "grey50") + facet_grid(cols = vars(`set`)) +  theme(legend.position = "none") +  labs(
+    title = "rs78396808, ALL case control",
+    y = "Percentage of ALL cases",
+    x = "rs78396808"
+  ) + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 10, face = "bold"),
+    strip.text.x = element_text(angle = 0, size = 10, face = "bold", margin = margin(r= 0, unit = "cm")),
+    strip.placement = "outside",
+   axis.text = element_text(size = 10),
+   strip.background = element_blank(),
+   panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank()) 
+```
+
+
+# genotyes by race/ethnicity 
+```{r}
+df1_count <- df1 %>% count(rs78396808, CaCo) %>% filter(CaCo == "Case")
+
+df1_count_total_n <- df1 %>% count(rs78396808)
+
+df1_count <- df1_count %>% left_join(df1_count_total_n, by = "rs78396808") %>% mutate(case_per = n.x/n.y) %>% mutate(genotype = paste0(rs78396808,"\n(n=" ,n.x, ")"))
+
+
+df1_count -> df1_count_total
+
+
+###### Latinos ##############
+covariates_1487 <- fread("covariates_1487.txt")
+beadPosition_Latino_set2 <- covariates_1487 %>% filter(Ethnicity == "Latino") %>% filter(set == "set2")%>% pull(beadPosition)
+beadPosition_Latino_set3 <- covariates_1487 %>% filter(Ethnicity == "Latino") %>% filter(set == "set3")%>% pull(beadPosition)
+beadPosition_Latino_set4 <- covariates_1487 %>% filter(Ethnicity == "Latino") %>% filter(set == "set4")%>% pull(beadPosition)
+
+df1_count <- df1 %>% filter(beadPosition %in% c(beadPosition_Latino_set2, beadPosition_Latino_set3, beadPosition_Latino_set4))%>% count(set, rs78396808)
+df1_count <- df1 %>% filter(beadPosition %in% c(beadPosition_Latino_set2, beadPosition_Latino_set3, beadPosition_Latino_set4))%>% count(rs78396808, CaCo) %>% filter(CaCo == "Case")
+df1_count_total_n <- df1 %>% filter(beadPosition %in% c(beadPosition_Latino_set2, beadPosition_Latino_set3, beadPosition_Latino_set4))%>% count(rs78396808)
+df1_count <- df1_count %>% left_join(df1_count_total_n, by = "rs78396808") %>% mutate(case_per = n.x/n.y) %>% mutate(genotype = paste0(rs78396808,"\n(n=" ,n.x, ")"))
+df1_count -> df1_count_Latino
+
+###### non-Latino Whites ##############
+covariates_1487 <- fread("covariates_1487.txt")
+
+beadPosition_NHW_set2 <- covariates_1487 %>% filter(Ethnicity == "Non-Latino White") %>% filter(set == "set2")%>% pull(beadPosition)
+beadPosition_NHW_set3 <- covariates_1487 %>% filter(Ethnicity == "Non-Latino White") %>% filter(set == "set3")%>% pull(beadPosition)
+beadPosition_NHW_set4 <- covariates_1487 %>% filter(Ethnicity == "Non-Latino White") %>% filter(set == "set4")%>% pull(beadPosition)
+
+
+df1_count <- df1 %>% filter(beadPosition %in% c(beadPosition_NHW_set2, beadPosition_NHW_set3, beadPosition_NHW_set4))%>% count(rs78396808, CaCo) %>% filter(CaCo == "Case")
+
+df1_count_total_n <- df1 %>% filter(beadPosition %in% c(beadPosition_NHW_set2, beadPosition_NHW_set3, beadPosition_NHW_set4))%>% count(rs78396808)
+
+df1_count <- df1_count %>% left_join(df1_count_total_n, by = "rs78396808") %>% mutate(case_per = n.x/n.y) %>% mutate(genotype = paste0(rs78396808,"\n(n=" ,n.x, ")"))
+
+df1_count -> df1_count_NHW
+```
+
+
+```{r, fig.width = 6, fig.height=5}
+df1_count_total$group ="total"
+df1_count_Latino$group = "Latinos"
+df1_count_NHW$group = "non-Latino Whites"
+
+p <- rbind(df1_count_total, df1_count_Latino, df1_count_NHW) %>% 
+  rbind(., 
+        data.frame(rs78396808 ="AA", case_per = 0, genotype = "AA\n(n=0)", 
+                   group = "non-Latino Whites"), fill = T) %>% 
+  mutate(group = as.factor(group), 
+         group = factor(group, levels = c("total", "Latinos", "non-Latino Whites"))) %>% 
+  ggplot(aes(y=case_per, x=genotype)) + 
+  geom_col(fill = "grey50") +  
+  theme(legend.position = "none") + 
+  labs(
+    title = "rs78396808, ALL case control",
+    y = "Percentage of ALL cases",
+    x = "rs78396808") + 
+  facet_grid(~group, scales="free") + 
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 10, face = "bold"),
+    strip.text.x = element_text(angle = 0, size = 10, face = "bold", margin = margin(r= 0, unit = "cm")),
+    strip.placement = "outside",
+    axis.text = element_text(size = 10),
+    strip.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()) + 
+  geom_text(aes(label=round(case_per, digits = 3)), vjust=-0.3, size=3.5) + 
+  scale_y_continuous(limits = c(0,0.7)) 
+
+dat_text <- data.frame(
+  group = c("total", "Latinos", "non-Latino Whites"),
+  label = c("4", "6", "8"),
+  x = c(1, 1, 1),
+  y = c(0.6, 0.6, 0.6))
+
+p
+```
+
+
+```{r}
+df1_count <- df1 %>% 
+  count(rs78396808, CaCo)  %>%  
+  left_join(
+    aggregate(df1 %>% 
+                count(rs78396808, CaCo) %>% 
+                .$n, 
+              by=list(Category=df1 %>% count(rs78396808, CaCo) %>% .$CaCo), 
+              FUN=sum) %>% 
+      rename("CaCo" = "Category", "total" = "x"), by = "CaCo") %>% 
+  mutate(percent = n/total)
+
+df1_Latino <- df1 %>% 
+  filter(beadPosition %in% c(beadPosition_Latino_set2, beadPosition_Latino_set3, beadPosition_Latino_set4))
+
+df1_NHW <- df1 %>% 
+  filter(beadPosition %in% c(beadPosition_NHW_set2, beadPosition_NHW_set3, beadPosition_NHW_set4))
+
+df1_Latino_count <- df1_Latino %>% 
+  count(rs78396808, CaCo)  %>%  
+  left_join(aggregate(df1_Latino %>% 
+                        count(rs78396808, CaCo) %>% .$n,
+                      by=list(Category=df1_Latino %>%count(rs78396808, CaCo) %>% .$CaCo), 
+                      FUN=sum) %>% 
+              rename("CaCo" = "Category", "total" = "x"), by = "CaCo") %>% mutate(percent = n/total)
+
+df_AA <- data.frame(rs78396808 = rep(c("AA"),2), 
+                    CaCo = c("Case", "Control"), 
+                    n = c(0, 0), 
+                    total = c(196, 217), 
+                    percent = c(0,0))
+
+df1_NHW_count <-  df1_NHW %>% 
+  count(rs78396808, CaCo)  %>%  
+  left_join(aggregate(df1_NHW %>% count(rs78396808, CaCo) %>% .$n, 
+                      by=list(Category=df1_NHW %>% count(rs78396808, CaCo) %>% .$CaCo), 
+                      FUN=sum) %>% 
+              rename("CaCo" = "Category", "total" = "x"), by = "CaCo") %>% 
+  mutate(percent = n/total)
+
+df1_NHW_count <- rbind(df1_NHW_count, df_AA)
+
+df1_count$group <- "total"
+df1_Latino_count$group <- "Latinos"
+df1_NHW_count$group <- "non-Latino Whites"
+
+df1_graph <- rbind(df1_count, df1_Latino_count, df1_NHW_count)
+
+p <- df1_graph %>% 
+  mutate(CaCo = ifelse(CaCo == "Case", "Case, n=683", "Control, n=804")) %>% 
+  mutate(group = as.factor(group), 
+         group = factor(group, levels = c("total", "Latinos", "non-Latino Whites"))) %>% 
+  ggplot(aes(y=percent, x=rs78396808, fill=CaCo)) + 
+  geom_bar(position = position_dodge2(width = 0.9, preserve = "single"), stat="identity") +  
+  theme(legend.position = "bottom") +  
+  labs(
+    title = "rs78396808, ALL case control",
+    y = "Percentage",
+    x = "rs78396808") + 
+  facet_grid(~group,scales = "free_x", space = "free_x") + 
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 14, face = "bold"),
+    strip.text.x = element_text(angle = 0, size = 12, face = "bold", margin = margin(r= 0, unit = "cm")),
+    strip.placement = "outside",
+    axis.text = element_text(size = 14),
+    axis.title = element_text(size = 14),
+    strip.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.text = element_text(size=14))  + 
+  scale_y_continuous(limits = c(0,1), breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1)) + 
+  guides(fill = guide_legend(title = "")) +  
+  scale_fill_manual(values = c("black", "grey"))
+```
+
+
+```{r, fig.width = 18, fig.height=7}
+p1 + p2 + p
+```
