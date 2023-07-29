@@ -1,0 +1,213 @@
+---
+title: "deletion"
+author: "Keren Xu"
+date: "1/22/2020"
+output: 
+  rmarkdown::html_document:
+    toc: true  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(fig.width= 7, fig.height=5) 
+```
+
+# Load packages  
+```{r}
+library(tidymeta)
+library(ggplot2)
+library(dplyr)
+library(broom)
+library(tidyverse)
+library(metafor)
+library(Cairo)
+library(mbmisc)
+library(patchwork)
+library(ggpubr)
+theme_set(theme_pubr())
+```
+
+# Load datasets
+```{r}
+df_poisson_methylation_score <- read.csv("df_poisson_methylation_score.csv")
+df_poisson_methylation_score_set4  <- read.csv("df_poisson_methylation_score_set4.csv")
+df_poisson_methylation_score_dic <- read.csv("df_poisson_methylation_score_dic.csv")
+df_poisson_methylation_score_dic_set4  <- read.csv("df_poisson_methylation_score_dic_set4.csv")
+df_poisson_methylation_score_no_AHRR <- read.csv("df_poisson_methylation_score_no_AHRR.csv")
+df_poisson_methylation_score_no_AHRR_set4  <- read.csv("df_poisson_methylation_score_no_AHRR_set4.csv")
+df_poisson_ahrr  <- read.csv("df_poisson_AHRR.csv")
+df_poisson_ahrr_set4  <- read.csv("df_poisson_ahrr_set4.csv")
+df_smoking_outcome_AHRR_score <- read.csv("df_smoking_outcome_AHRR_score.csv")
+df_smoking_outcome_AHRR_score_set4 <- read.csv("df_smoking_outcome_AHRR_score_set4.csv")
+df_smoking_outcome_methylation_score <- read.csv("df_smoking_outcome_methylation_score.csv")
+df_smoking_outcome_methylation_score_set4 <- read.csv("df_smoking_outcome_methylation_score_set4.csv")
+```
+
+
+```{r}
+df_poisson_methylation <- rbind(df_poisson_methylation_score, df_poisson_methylation_score_set4)
+
+L <- nrow(df_poisson_methylation)
+df_poisson_methylation <- df_poisson_methylation %>% mutate(yi = rep(NA, L), sei = rep(NA, L), vi = rep(NA, L))
+
+df_poisson_methylation$yi <- replmiss(df_poisson_methylation$yi, log(df_poisson_methylation$estimate))
+
+df_poisson_methylation$sei <- replmiss(df_poisson_methylation$sei, with(df_poisson_methylation, (log(conf.high) - log(conf.low))/(2*1.96)))
+
+df_poisson_methylation$vi <- replmiss(df_poisson_methylation$vi, df_poisson_methylation$sei^2)
+
+df_poisson_methylation$sei <- NULL
+
+df_poisson_methylation_total <- df_poisson_methylation %>% filter(sex == "total")
+
+m_total <- df_poisson_methylation_total %>% 
+ meta_analysis(yi = yi, 
+               vi = vi, 
+               slab = set, 
+               exponentiate = TRUE, method="FE") 
+
+m_total_methylation <- m_total
+```
+
+
+```{r}
+df_poisson_methylation <- rbind(df_poisson_methylation_score_dic, df_poisson_methylation_score_dic_set4)
+
+L <- nrow(df_poisson_methylation)
+df_poisson_methylation <- df_poisson_methylation %>% mutate(yi = rep(NA, L), sei = rep(NA, L), vi = rep(NA, L))
+
+df_poisson_methylation$yi <- replmiss(df_poisson_methylation$yi, log(df_poisson_methylation$estimate))
+
+df_poisson_methylation$sei <- replmiss(df_poisson_methylation$sei, with(df_poisson_methylation, (log(conf.high) - log(conf.low))/(2*1.96)))
+
+df_poisson_methylation$vi <- replmiss(df_poisson_methylation$vi, df_poisson_methylation$sei^2)
+
+df_poisson_methylation$sei <- NULL
+
+df_poisson_methylation_total <- df_poisson_methylation %>% filter(sex == "total")
+
+m_total <- df_poisson_methylation_total %>% 
+ meta_analysis(yi = yi, 
+               vi = vi, 
+               slab = set, 
+               exponentiate = TRUE, method="FE") 
+
+m_total_methylation_dic <- m_total
+```
+
+
+```{r}
+df_poisson_methylation <- rbind(df_poisson_methylation_score_no_AHRR, df_poisson_methylation_score_no_AHRR_set4)
+
+L <- nrow(df_poisson_methylation)
+df_poisson_methylation <- df_poisson_methylation %>% mutate(yi = rep(NA, L), sei = rep(NA, L), vi = rep(NA, L))
+
+df_poisson_methylation$yi <- replmiss(df_poisson_methylation$yi, log(df_poisson_methylation$estimate))
+
+df_poisson_methylation$sei <- replmiss(df_poisson_methylation$sei, with(df_poisson_methylation, (log(conf.high) - log(conf.low))/(2*1.96)))
+
+df_poisson_methylation$vi <- replmiss(df_poisson_methylation$vi, df_poisson_methylation$sei^2)
+
+df_poisson_methylation$sei <- NULL
+
+df_poisson_methylation_total <- df_poisson_methylation %>% filter(sex == "total")
+
+m_total <- df_poisson_methylation_total %>% 
+ meta_analysis(yi = yi, 
+               vi = vi, 
+               slab = set, 
+               exponentiate = TRUE, method="FE") 
+
+m_total_methylation_no_ahrr <- m_total  
+```
+
+
+```{r}
+df_poisson_ahrr_total <- rbind(df_poisson_ahrr, df_poisson_ahrr_set4)
+df_poisson_methylation <- df_poisson_ahrr_total
+L <- nrow(df_poisson_methylation)
+df_poisson_methylation <- df_poisson_methylation %>% mutate(yi = rep(NA, L), sei = rep(NA, L), vi = rep(NA, L))
+
+df_poisson_methylation$yi <- replmiss(df_poisson_methylation$yi, log(df_poisson_methylation$estimate))
+
+df_poisson_methylation$sei <- replmiss(df_poisson_methylation$sei, with(df_poisson_methylation, (log(conf.high) - log(conf.low))/(2*1.96)))
+
+df_poisson_methylation$vi <- replmiss(df_poisson_methylation$vi, df_poisson_methylation$sei^2)
+
+df_poisson_methylation$sei <- NULL
+
+df_poisson_methylation_total <- df_poisson_methylation %>% filter(sex == "total")
+
+m_total <- df_poisson_methylation_total %>% 
+ meta_analysis(yi = yi, 
+               vi = vi, 
+               slab = set, 
+               exponentiate = TRUE, method="FE") 
+
+m_total_ahrr <- m_total
+```
+
+
+```{r, fig.width= 8, fig.height = 6}
+m_total_methylation <- m_total_methylation %>% mutate(group = "Polyepigenetic \n smoking score") %>% mutate(study = case_when(
+  study == "set1,2" ~ "450K",
+  study == "set4" ~ "EPIC",
+  study == "Overall" ~ "Summary"
+))
+
+m_total_methylation_dic <- m_total_methylation_dic %>% mutate(group = "DNA methylation \n smoking score \n binary") %>% mutate(study = case_when(
+  study == "set1,2" ~ "450K",
+  study == "set4" ~ "EPIC",
+  study == "Overall" ~ "Summary"
+))
+m_total_methylation_no_ahrr <- m_total_methylation_no_ahrr %>% mutate(group = "Polyepigenetic \n smoking score \n without AHRR") %>% mutate(study = case_when(
+  study == "set1,2" ~ "450K",
+  study == "set4" ~ "EPIC",
+  study == "Overall" ~ "Summary"
+))
+m_total_ahrr <- m_total_ahrr %>% mutate(group = "AHRR cg05575921 \n methylation") %>% mutate(study = case_when(
+  study == "set1,2" ~ "450K",
+  study == "set4" ~ "EPIC",
+  study == "Overall" ~ "Summary"
+)) 
+m_total_ahrr[1,7] <- 1.02
+m_total_ahrr[1,8] <- 1.69
+
+meta_df <- rbind(m_total_ahrr, m_total_methylation, m_total_methylation_no_ahrr)
+
+dat_text <- data.frame(
+  label = c("paste(I^2,\"=0.00%,\",I^2, \" p=0.971\")", "paste(I^2,\"=0.00%,\",I^2, \" p=0.704\")", "paste(I^2,\"=0.00%,\",I^2, \" p=0.513\")"),
+  group = c("AHRR cg05575921 \n methylation", "Polyepigenetic \n smoking score", "Polyepigenetic \n smoking score \n without AHRR")
+)
+
+meta_df <- meta_df %>% right_join(., dat_text)
+
+fp <- forest_plot(meta_df, group = group)+
+  ggplot2::geom_vline(xintercept = 1, linetype = "dashed") + 
+  geom_text(
+  data    = meta_df,
+  mapping = aes(x = 1.5, y = 0.1, label = label),
+  size = 3,
+  hjust   = -0.1,
+  vjust   = -1,
+  color = "grey50",
+  parse = T,
+  face =1
+)+theme(axis.text.y = element_text(face = c("bold", rep("plain", 21)))) + scale_color_grey(start=0.5, end=0.1) + colorblindr::scale_color_OkabeIto() 
+
+txt_tbl <- meta_df %>% 
+  #  round weights without dropping zeroes
+  mutate(weight = round_with_zeros(weight),
+  #  paste together estimate and CIs in format OR (Lower-Upper)
+         est_ci95 = est_ci(estimate, conf.low, conf.high, descriptor = "")) %>% 
+  #  use text_table without y-axis information since that's in the forest plot
+  text_table(group = group, "Weights" = weight,
+                             "RM (95% CI)" = est_ci95,
+             show_y_axis = FALSE,
+             show_y_facets = FALSE, size = 4) 
+
+fp + txt_tbl +  plot_layout(widths = c(1, 1))
+```
+
