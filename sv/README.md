@@ -38,5 +38,5 @@ This is an HPC pipeline for calling structural variations using three software f
 an example Venn graph:
 
 <p align="center">
-<img src='venn.png' width='400'>
+<img src='../_static/venn.png' width='400'>
 </p>

@@ -14,7 +14,7 @@ from `0.0.ExtractIntervalfromPON.sh` to `1.9.FuncotateSegments.sh`
 Best practice workflow. A figure from GITC.
 
 <p align="center">
-<img src='gatkcnv.png' width='300'>
+<img src='../_static/gatkcnv.png' width='300'>
 </p>
 
 ## CNVkit pipeline
