@@ -1,0 +1,198 @@
+---
+title: "CMplot"
+author: "Keren Xu"
+date: "05/26/2021"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(fig.width= 7, fig.height=5) 
+```
+
+
+
+# Load packages  
+```{r}
+library(tidyverse)
+require(data.table)
+library(pals)
+library(colorblindr)
+library(patchwork)
+library(CMplot)
+theme_set(theme_light()) 
+```
+
+
+## load dataset 
+```{r}
+meta34 <- fread("metafor_set34_anno_filtered.txt")
+meta234 <- fread("metafor_set234_anno_filtered.txt")
+
+mqtl_dmp234 <- fread("../mqtl/ewas_noob_epistructure_everyone_removeDS/mqtl_metafor_output_dmp234.csv")
+mqtl_dmp34 <- fread("../mqtl/ewas_noob_epistructure_everyone_removeDS/mqtl_metafor_output_dmp34.csv")
+
+mqtl_dmp234 %>% pull(gene) -> cpg_dmp234 
+mqtl_dmp34 %>% pull(gene) -> cpg_dmp34 
+
+dim(meta34)[1]
+dim(meta234)[1]
+
+meta234 %>% arrange(p.fe) %>% mutate(id = row_number()) %>% .[which(probe == "cg01139861")] %>% pull(id)
+```
+
+
+# visualize plots  
+```{r, fig.width = 15, fig.height=12}
+meta34_CM_plot <- meta34%>%
+  dplyr::mutate(p_val_cmplot = -log10(p.fe))%>%
+  dplyr::mutate(p_val_cmplot= ifelse(coef.fe < 0 ,-p_val_cmplot, p_val_cmplot )) %>%
+  dplyr::select(probe, chr,pos, p_val_cmplot)
+
+meta34_CM_plot$chr <- gsub("chr","",meta34_CM_plot$chr)
+
+meta34_CM_plot <- meta34_CM_plot %>% rename("Chromosome" = "chr")
+
+cpgs <- c("cg13344587", "cg25722431")
+
+genes <- c("ARID5B", "SMURF1")
+
+yadj <- c(-1,  -1)
+
+xadj <- c(1,  1)
+set.seed(2021)
+
+CMplot(
+  meta34_CM_plot,
+  plot.type="m", 
+  band=1, 
+  LOG10=FALSE, 
+  signal.col=NULL, 
+  cex = c(0.5,0.5,0.5),
+  chr.den.col=NULL,
+  threshold=c(log10(0.05/dim(meta34)[1]),4,-4, -log10(0.05/703715)),
+  amplify=FALSE,
+  threshold.lty=2, 
+  threshold.lwd=1, 
+  threshold.col=c("#FF0000", "#046C9A", "#046C9A", "#FF0000"),
+  file="jpg",
+  memo="",
+  dpi=300,
+  file.output=TRUE,
+  verbose=TRUE,
+  ylim=c(-10,10),
+  width=14,
+  height=6, 
+  highlight=cpgs, 
+  highlight.text=genes, 
+  highlight.text.yadj = yadj, 
+  highlight.text.xadj = xadj, 
+  highlight.col = NULL, 
+  ylab=expression(paste(log[10], italic(P[hypo]), "            ",
+                        -log[10], italic(P[hyper]))), 
+  main="EPIC array meta-analysis")
+```
+
+
+```{r}
+meta234_CM_plot <- meta234%>%
+  dplyr::mutate(p_val_cmplot = -log10(p.fe))%>%
+  dplyr::mutate(p_val_cmplot= ifelse(coef.fe < 0 ,-p_val_cmplot, p_val_cmplot )) %>%
+  dplyr::select(probe, chr,pos, p_val_cmplot)
+
+meta234_CM_plot$chr <- gsub("chr","",meta234_CM_plot$chr)
+
+meta234_CM_plot <- meta234_CM_plot %>% rename("Chromosome" = "chr")
+
+cpgs <- c("cg13344587", "cg01139861")
+genes <- c("ARID5B","IKZF1")
+
+yadj <- c(-1, 1)
+
+xadj <- c(1, 1)
+
+CMplot(
+  meta234_CM_plot,
+  plot.type="m", 
+  band=1, 
+  LOG10=FALSE, 
+  signal.col=NULL, 
+  cex = c(0.5,0.5,0.5),
+  chr.den.col=NULL,
+  threshold=c(log10(0.05/dim(meta234)[1]),4,-4, -log10(0.05/364027)),
+  amplify=FALSE,
+  threshold.lty=2, 
+  threshold.lwd=1, 
+  threshold.col= c("#FF0000", "#046C9A", "#046C9A", "#FF0000"),
+  file="jpg",
+  memo="",
+  dpi=300,
+  file.output=TRUE,
+  verbose=TRUE,
+  ylim=c(-10,10),
+  width=14,
+  height=6, 
+  highlight=cpgs, 
+  highlight.text=genes, 
+  highlight.text.yadj = yadj, 
+  highlight.text.xadj = xadj, 
+  highlight.col = NULL, 
+  ylab=expression(paste(log[10], 
+                        italic(P[hypo]), 
+                        "            ",
+                        -log[10], 
+                        italic(P[hyper]))), 
+  main="Overall meta-analysis")
+```
+
+
+# qqplot  
+```{r}
+meta234_CM_plot <- meta234 %>%
+  dplyr::select(probe, chr,pos, p.fe)
+
+meta234_CM_plot$chr <- gsub("chr","",meta234_CM_plot$chr)
+
+meta34_CM_plot <- meta34 %>%
+  dplyr::select(probe, chr,pos, p.fe)
+
+meta34_CM_plot$chr <- gsub("chr","",meta34_CM_plot$chr)
+
+CMplot(
+  meta234_CM_plot,
+  plot.type="q",
+  box=FALSE,
+  file="jpg",
+  memo="",
+  dpi=300,
+  conf.int=TRUE,
+  conf.int.col=NULL,
+  threshold.col="red",
+  threshold.lty=2,
+  file.output=TRUE,
+  verbose=TRUE,
+  width=5,
+  height=5, 
+  main = "Overall meta-analysis\nlambda = 1.020", 
+  main.cex = 1)
+
+CMplot(
+  meta34_CM_plot,
+  plot.type="q",
+  box=FALSE,
+  file="jpg",
+  memo="",dpi=300,
+  conf.int=TRUE,
+  conf.int.col=NULL,
+  threshold.col="red",
+  threshold.lty=2,
+  file.output=TRUE,
+  verbose=TRUE,
+  width=5,
+  height=5, 
+  main = "EPIC array meta-analysis\nlambda = 1.086", main.cex = 1)
+```
+
