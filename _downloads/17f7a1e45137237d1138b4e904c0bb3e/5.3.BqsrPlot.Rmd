@@ -1,0 +1,153 @@
+---
+title: "bqsr plots"
+author: "Keren Xu"
+date: "09/12/2021"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(fig.width= 7, fig.height=5) 
+```
+
+# Load packages  
+```{r}
+library(tidyverse)
+require(dplyr)
+require(data.table)
+library(pals)
+library(colorblindr)
+theme_set(theme_light()) 
+```
+
+## Aggregate BQSR stats from individual samples  
+```{r}
+# read file path
+all_paths <- list.files(path = "table.AnalyzeCovariates.csv",pattern = "*.csv",full.names = TRUE)
+ 
+# read file content
+all_content <-
+  all_paths %>%
+  lapply(read.csv,
+         header = TRUE)
+ 
+# read file name
+all_filenames <- all_paths %>%
+  basename() %>%
+  as.list()
+ 
+# combine file content list and file name list
+all_lists <- mapply(c, all_content, all_filenames, SIMPLIFY = FALSE)
+ 
+# unlist all lists and change column name
+all_result <- rbindlist(all_lists, fill = T)
+
+# change column name
+names(all_result)[3] <- "File.Path"
+
+all_result$sample_id <- gsub("_AnalyzeCovariates.csv", "", all_result$V1)
+
+all_result <- all_result %>% separate("sample_id", c("subjectid", "junk"), sep = ".Analyze") %>% select(-junk)
+
+all_result <- all_result %>% mutate(readgroup = paste0(subjectid,".", ReadGroup))
+```
+
+## Data visualization
+```{r, fig.width= 20, fig.height=18}
+all_result %>% ggplot(aes(x = AverageReportedQuality, y = EmpiricalQuality, color = Recalibration)) + 
+  geom_abline(intercept = 0, slope = 1,  linetype="dashed") + 
+  geom_point(size = 1, aes(alpha = log10(Observations))) + 
+  facet_wrap(~readgroup) + 
+  labs(title="BQSR for Base Substitution", x = "Reported Quality", y = "Empirical Quality \n", size = 1)  +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    strip.text.y = element_text(angle = 270, face = "bold",margin = margin(r= 1, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.text = element_text(size = 12),
+    legend.position = "right"
+    ) + 
+  guides(color = guide_legend(reverse = TRUE)) + 
+  scale_y_continuous(expand = c(0, 0)) + 
+  scale_x_continuous(expand = c(0, 0))  +
+  scale_color_manual(values=as.vector(cols25(2))) 
+```
+
+```{r, fig.width= 20, fig.height=18}
+all_result %>% 
+  filter(File.Path == "Cycle") %>% 
+  mutate(CovariateValue = as.numeric(CovariateValue)) %>% 
+  ggplot(aes(x = CovariateValue, y = Accuracy, color = Recalibration))  + 
+  geom_hline(yintercept = 0, linetype="dashed")  + 
+  geom_point( size = 0.05, aes(alpha = log10(Observations))) + 
+  facet_wrap(~readgroup, ncol = 7) + 
+  labs(x = "Machine Cycle",y = "Accuracy", title="BQSR for Base Substitution", size = 1) + 
+  theme(
+    axis.text.x = element_text(angle = 90),
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    strip.text.y = element_text(angle = 270, face = "bold",margin = margin(r= 1, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.text = element_text(size = 10),
+    legend.position = "right"
+    ) + 
+  guides(color = guide_legend(reverse = TRUE)) + 
+  scale_y_continuous(expand = c(0, 0)) + 
+  scale_x_continuous(expand = c(0, 0))  +
+  scale_color_manual(values=as.vector(cols25(2))) 
+```
+
+```{r, fig.width= 20, fig.height=18}
+all_result %>% 
+  filter(File.Path == "Context") %>% 
+  ggplot(aes(x = CovariateValue, y = Accuracy, color = Recalibration))  + 
+  geom_hline(yintercept = 0, linetype="dashed")  + 
+  geom_point( size = 1, aes(alpha = log10(Observations))) + 
+  facet_wrap(~readgroup) +  
+  theme(axis.text.x = element_text(angle = 90), 
+        legend.position = "bottom") + 
+  labs(x = "Dinucleotide", y = "Accuracy", title="BQSR for Base Substitution", size = 1) +
+  theme(
+    axis.text.x = element_text(angle = 90),
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    strip.text.y = element_text(angle = 270, face = "bold",margin = margin(r= 1, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+   axis.text = element_text(size = 7),
+    legend.position = "right"
+    ) + 
+  guides(color = guide_legend(reverse = TRUE)) + 
+  scale_y_continuous(expand = c(0, 0))  +
+  scale_color_manual(values=as.vector(cols25(2))) 
+```
+
+```{r, fig.width= 12, fig.height=8}
+all_result %>% 
+  filter(File.Path == "QualityScore") %>% 
+  ggplot(aes(x = CovariateValue, y = Observations,fill = Recalibration)) + 
+  geom_col(alpha = 0.8) + 
+  facet_wrap(~readgroup) +
+  theme(legend.position = "bottom") + 
+  labs(x = "Quality Score",y = "Observations \n", title="BQSR for Quality Score", size = 1) + 
+  scale_x_discrete(breaks = c(10, 20, 30, 40)) +
+  theme(
+    axis.text.x = element_text(angle = 90),
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    strip.text.y = element_text(angle = 270, face = "bold",margin = margin(r= 1, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.text = element_text(size = 7),
+    legend.position = "right"
+    ) +
+  guides(fill = guide_legend(reverse = TRUE)) + 
+  scale_y_continuous(expand = c(0, 0))  +
+  scale_fill_manual(values=as.vector(cols25(2))) 
+```
+
