@@ -52,4 +52,4 @@ jobs:
         if: github.ref == 'refs/heads/feature/sphinx'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: doc/_build/html
+          publish_dir: ./_build/html
