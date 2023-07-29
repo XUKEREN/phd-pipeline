@@ -1,4 +1,2 @@
-```{include} README.md
-:relative-docs:  
-:relative-images:  
-```
+.. include:: README.md
+   :parser: myst_parser.sphinx_
