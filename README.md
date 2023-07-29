@@ -12,7 +12,7 @@ Some workflows I wrote for my phd research projects:
 - [CNV pipelines](./cnv/README.md)
 - [Mutational signatures](./mutational_signatures/README.md)
 - [Telomere length estimation](./telomere_length/README.md)
-- [Eigenetic clock]
+- [Eigenetic clock](./eigenetic_clock/README.md)
 
 ## Association studies
 
