@@ -1,0 +1,236 @@
+---
+title: "deletion"
+author: "Keren Xu"
+date: "1/22/2020"
+output: 
+  rmarkdown::html_document:
+    toc: true  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(fig.width= 7, fig.height=5) 
+```
+
+
+# Load packages    
+```{r}
+library(tidyverse)
+library(tableone)
+library(knitr)
+library(scales)
+library(purrr)
+library(corrplot)
+library(broom)
+library(jtools)
+library(forcats)
+library(lmtest)
+library(ggplot2)
+library(patchwork)
+library(ggpubr)
+library(grid)
+library(ggrepel)
+theme_set(theme_pubr()) 
+```
+
+
+
+```{r, fig.width= 11, fig.height = 7}
+
+smoking_outcome_methylation_score_set12 <- read.csv("smoking_outcome_methylation_score_set12.csv")
+smoking_outcome_methylation_score_set4 <- read.csv("smoking_outcome_methylation_score_set4.csv")
+smoking_outcome_AHRR_score_set12 <- read.csv("smoking_outcome_AHRR_score_set12.csv")
+smoking_outcome_AHRR_score_set4 <- read.csv("smoking_outcome_AHRR_score_set4.csv")
+
+smoking_outcome_methylation_score_set12 <- smoking_outcome_methylation_score_set12 %>% mutate(set = "450K", outcome = "Polyepigenetic smoking score")
+smoking_outcome_methylation_score_set4 <- smoking_outcome_methylation_score_set4 %>% mutate(set = "EPIC", outcome = "Polyepigenetic smoking score")
+smoking_outcome_AHRR_score_set12 <- smoking_outcome_AHRR_score_set12 %>% mutate(set = "450K", outcome = "DNA methylation at AHRR CpG cg05575921")
+smoking_outcome_AHRR_score_set4 <- smoking_outcome_AHRR_score_set4 %>% mutate(set = "EPIC", outcome = "DNA methylation at AHRR CpG cg05575921")
+
+smoking_outcome_score <- rbind(
+smoking_outcome_methylation_score_set12,smoking_outcome_methylation_score_set4,smoking_outcome_AHRR_score_set12,smoking_outcome_AHRR_score_set4
+) %>% mutate(p_value = ifelse(p.value > 0.05, "Significant", "Non-significant"))
+
+smoking_outcome_score <- smoking_outcome_score %>% 
+  mutate(term = case_when(
+  term ==  "f_ever_sm_di1" ~ "Paternal, ever", 
+  term ==  "f_sm_now_di1" ~ "Paternal, now",
+  term == "f_sm_pre_di1" ~ "Paternal, preconception",
+  term == "f_cignumpre_5_unit" ~ "Paternal, preconception (CPD)",
+  term == "m_ever_sm_di1" ~ "Maternal, ever",
+  term == "m_sm_now_di1" ~ "Maternal, now",
+  term == "m_sm_pre_di1" ~ "Maternal, preconception",
+  term == "m_cignumpre_5_unit" ~ "Maternal, preconception (CPD)",
+  term == "m_sm_preg_di1" ~ "Maternal, pregnancy",
+  term == "m_cignumpreg_5_unit" ~ "Maternal, pregnancy (CPD)",
+  term == "m_sm_bf_di1" ~ "Maternal, breastfeeding",
+  term == "m_cignum_bf_5_unit" ~ "Maternal, breastfeeding (CPD)",
+  term == "m_sm_post_di1" ~ "Maternal, postnatal",
+  term == "m_cignum_post_5_unit" ~ "Maternal, postnatal (CPD)",
+  term == "ch_shs_othsm_indoor1" ~ "Child, postnatal passive (other)",
+  term == "ch_shs_parent1" ~ "Child, postnatal passive (parent)",
+  term == "ch_shs1" ~ "Child, postnatal passive",
+  term == "cumulative_smoking_score_cont" ~ "Cumulative exposures",
+  term == "m_sm_prenatal_di1" ~ "Maternal, prenatal",
+  term == "m_cignumprenatal_5_unit" ~ "Maternal, prenatal (CPD)",
+  term == "AHRR_negative10" ~ "AHRR cg05575921 methylation (-0.1beta)",
+  term == "Methylation_score_sd" ~ "Methylation smoking score (SD)",
+  term == "`Maternal,throughout pregnancy vs. never`1" ~ "Maternal, throughout pregnancy vs. never"
+  ))
+
+smoking_outcome_score %>%  
+  ggplot() + 
+  geom_pointrange(aes(x = term, 
+                      y = estimate, 
+                      ymin = conf.low, 
+                      ymax = conf.high, 
+                      label = p.value, 
+                      group = factor(set, levels = c("EPIC", "450K")), 
+                      color = set, 
+                      shape = p_value), 
+                  position = position_dodge(width = 0.5)) +
+  geom_hline(aes(yintercept=0), linetype="dashed") + 
+  theme(legend.position = "right",  
+        plot.title = element_text(size=12)) + 
+  labs(y = "Effect estimates", x = "Self-reported tobacco smoke exposures") + 
+  ggtitle("Linear regression results")  + 
+  coord_flip() + 
+  scale_colour_manual(name="Sample",
+                      values=c("grey50", "black")) + 
+  scale_shape_manual(name = "P value",
+                     labels = c("<0.05", ">=0.05"),
+                     values = c(16, 17)) + 
+  facet_wrap(~outcome, ncol = 2, scales = "free_x") +
+  theme(strip.background = element_blank(), 
+        strip.text.x = element_text(size = 11)) +
+  colorblindr::scale_color_OkabeIto()
+```
+
+
+```{r, fig.width= 11, fig.height = 5}
+smoking_outcome_methylation_score_set12_jointeffect <- read.csv("smoking_outcome_methylation_score_set12_jointeffect.csv")
+smoking_outcome_methylation_score_set4_jointeffect <- read.csv("smoking_outcome_methylation_score_set4_jointeffect.csv")
+smoking_outcome_AHRR_score_set12_jointeffect <- read.csv("smoking_outcome_AHRR_score_set12_jointeffect.csv")
+smoking_outcome_AHRR_score_set4_jointeffect <- read.csv("smoking_outcome_AHRR_score_set4_jointeffect.csv")
+
+smoking_outcome_methylation_score_set12_jointeffect <- smoking_outcome_methylation_score_set12_jointeffect %>% mutate(set = "450K", outcome = "Polyepigenetic smoking score")
+smoking_outcome_methylation_score_set4_jointeffect <- smoking_outcome_methylation_score_set4_jointeffect %>% mutate(set = "EPIC", outcome = "Polyepigenetic smoking score")
+smoking_outcome_AHRR_score_set12_jointeffect <- smoking_outcome_AHRR_score_set12_jointeffect %>% mutate(set = "450K", outcome = "DNA methylation at AHRR CpG cg05575921")
+smoking_outcome_AHRR_score_set4_jointeffect <- smoking_outcome_AHRR_score_set4_jointeffect %>% mutate(set = "EPIC", outcome = "DNA methylation at AHRR CpG cg05575921")
+
+smoking_outcome_score <- rbind(
+  smoking_outcome_methylation_score_set12_jointeffect,
+  smoking_outcome_methylation_score_set4_jointeffect,
+  smoking_outcome_AHRR_score_set12_jointeffect,smoking_outcome_AHRR_score_set4_jointeffect
+) %>% 
+  mutate(p_value = ifelse(p.value > 0.05, "Significant", "Non-significant")) %>% 
+  mutate(joint_effects = case_when(
+    term %in% c("joint_pre_f_mYes_Yes", "joint_pre_f_mYes_No", "joint_pre_f_mNo_Yes") ~ "paternal preconception smoking \n maternal prenatal smoking",
+    term %in% c("joint_m_pre_ch_shsYes_Yes", "joint_m_pre_ch_shsYes_No", "joint_m_pre_ch_shsNo_Yes") ~ "maternal prenatal smoking \n child passive smoking",
+    term %in% c("joint_f_pre_ch_shsYes_Yes", "joint_f_pre_ch_shsYes_No", "joint_f_pre_ch_shsNo_Yes") ~ "paternal preconception smoking \n child passive smoking"
+  )) %>% 
+  mutate(level = case_when(
+    term %in% c("joint_pre_f_mYes_Yes", "joint_m_pre_ch_shsYes_Yes", "joint_f_pre_ch_shsYes_Yes") ~ "Yes Yes", 
+    term %in% c("joint_pre_f_mYes_No", "joint_m_pre_ch_shsYes_No", "joint_f_pre_ch_shsYes_No") ~ "Yes No", 
+    term %in% c("joint_pre_f_mNo_Yes", "joint_m_pre_ch_shsNo_Yes", "joint_f_pre_ch_shsNo_Yes") ~ "No Yes", 
+  ))
+
+
+smoking_outcome_score %>%  
+  ggplot() + 
+  geom_pointrange(
+    aes(x = level, y = estimate, ymin = conf.low, 
+        ymax = conf.high, label = p.value, 
+        group = factor(set, levels = c("EPIC", "450K")), 
+        color = set, shape = p_value), 
+    position = position_dodge(width = 0.5)) + 
+  geom_hline(aes(yintercept=0), linetype="dashed") + 
+  theme(legend.position = "right",  plot.title = element_text(size=12)) + 
+  labs(y = "Effect estimates", x = "Self-reported tobacco smoke exposures\njoint effects") + 
+  ggtitle("Linear regression results (joint effects)") + 
+  coord_flip() + 
+  scale_colour_manual(name="Sample", values=c("grey50", "black")) + 
+  scale_shape_manual(name = "P value",
+                     labels = c("<0.05", ">=0.05"),
+                     values = c(16, 17)) + 
+  facet_grid(joint_effects~outcome, scales = "free_x",, switch = "y") + 
+  theme(strip.text.y.left = element_text(angle = 0, size = 10), 
+        strip.background = element_blank(), strip.placement = "outside", 
+        strip.text.x = element_text(size = 10)) + 
+  colorblindr::scale_color_OkabeIto()
+
+```
+
+
+
+```{r, fig.width= 11, fig.height = 6}
+
+smoking_outcome_methylation_score_set12_mutuallyadjusted <- read.csv("smoking_outcome_methylation_score_set12_mutuallyadjusted.csv")
+smoking_outcome_methylation_score_set4_mutuallyadjusted <- read.csv("smoking_outcome_methylation_score_set4_mutuallyadjusted.csv")
+smoking_outcome_AHRR_score_set12_mutuallyadjusted <- read.csv("smoking_outcome_AHRR_score_set12_mutuallyadjusted.csv")
+smoking_outcome_AHRR_score_set4_mutuallyadjusted <- read.csv("smoking_outcome_AHRR_score_set4_mutuallyadjusted.csv")
+
+
+smoking_outcome_methylation_score_set12_mutuallyadjusted <- smoking_outcome_methylation_score_set12_mutuallyadjusted %>% mutate(set = "450K", outcome = "Polyepigenetic smoking score")
+smoking_outcome_methylation_score_set4_mutuallyadjusted <- smoking_outcome_methylation_score_set4_mutuallyadjusted %>% mutate(set = "EPIC", outcome = "Polyepigenetic smoking score")
+smoking_outcome_AHRR_score_set12_mutuallyadjusted <- smoking_outcome_AHRR_score_set12_mutuallyadjusted %>% mutate(set = "450K", outcome = "DNA methylation at AHRR CpG cg05575921")
+smoking_outcome_AHRR_score_set4_mutuallyadjusted <- smoking_outcome_AHRR_score_set4_mutuallyadjusted %>% mutate(set = "EPIC", outcome = "DNA methylation at AHRR CpG cg05575921")
+
+
+smoking_outcome_score <- rbind(
+  smoking_outcome_methylation_score_set12_mutuallyadjusted,
+  smoking_outcome_methylation_score_set4_mutuallyadjusted,
+  smoking_outcome_AHRR_score_set12_mutuallyadjusted,
+  smoking_outcome_AHRR_score_set4_mutuallyadjusted
+) %>% mutate(p_value = ifelse(p.value > 0.05, "Significant", "Non-significant"))
+
+smoking_outcome_score <- smoking_outcome_score %>% 
+  mutate(term = case_when(
+  term ==  "f_ever_sm_di1" ~ "Paternal, ever", 
+  term ==  "f_sm_now_di1" ~ "Paternal, now",
+  term == "f_sm_pre_di1" ~ "Paternal, preconception",
+  term == "f_cignumpre_5_unit" ~ "Paternal, preconception (CPD)",
+  term == "m_ever_sm_di1" ~ "Maternal, ever",
+  term == "m_sm_now_di1" ~ "Maternal, now",
+  term == "m_sm_pre_di1" ~ "Maternal, preconception",
+  term == "m_cignumpre_5_unit" ~ "Maternal, preconception (CPD)",
+  term == "m_sm_preg_di1" ~ "Maternal, pregnancy",
+  term == "m_cignumpreg_5_unit" ~ "Maternal, pregnancy (CPD)",
+  term == "m_sm_bf_di1" ~ "Maternal, breastfeeding",
+  term == "m_cignum_bf_5_unit" ~ "Maternal, breastfeeding (CPD)",
+  term == "m_sm_post_di1" ~ "Maternal, postnatal",
+  term == "m_cignum_post_5_unit" ~ "Maternal, postnatal (CPD)",
+  term == "ch_shs_othsm_indoor1" ~ "Child, postnatal passive (other)",
+  term == "ch_shs_parent1" ~ "Child, postnatal passive (parent)",
+  term == "ch_shs1" ~ "Child, postnatal passive",
+  term == "cumulative_smoking_score_cont" ~ "Cumulative exposures",
+  term == "m_sm_prenatal_di1" ~ "Maternal, prenatal",
+  term == "m_cignumprenatal_5_unit" ~ "Maternal, prenatal (CPD)",
+  term == "AHRR_negative10" ~ "AHRR cg05575921 methylation (-0.1beta)",
+  term == "Methylation_score_sd" ~ "Methylation smoking score (SD)",
+  term == "`Maternal,throughout pregnancy vs. never`1" ~ "Maternal, throughout pregnancy vs. never"
+  ))
+
+smoking_outcome_score %>%  
+  ggplot() + 
+  geom_pointrange(
+    aes(x = term, y = estimate, ymin = conf.low, ymax = conf.high, 
+        label = p.value, group = factor(set, levels = c("EPIC", "450K")), 
+        color = set, shape = p_value), 
+    position = position_dodge(width = 0.5)) + 
+  geom_hline(aes(yintercept=0), linetype="dashed") + 
+  theme(legend.position = "right",  plot.title = element_text(size=12)) + 
+  labs(y = "Effect estimates", x = "Self-reported tobacco smoke exposures") + 
+  ggtitle("Linear regression results (mutually adjusted)") + 
+  coord_flip() + 
+  scale_colour_manual(name="Sample",
+                      values=c("grey50", "black")) + 
+  scale_shape_manual(name = "P value",
+                     labels = c("<0.05", ">=0.05"),
+                     values = c(16, 17)) + 
+  facet_wrap(~outcome, ncol = 2, scales = "free_x") +
+  theme(strip.background = element_blank(), strip.text.x = element_text(size = 11)) + 
+  colorblindr::scale_color_OkabeIto()
+```
