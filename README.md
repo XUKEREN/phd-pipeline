@@ -27,8 +27,8 @@ Some workflows I wrote for my phd research projects:
 - [Chord diagram](./data_visualization/chord_diagram/README.md)
 - [Correlation heatmap](./data_visualization/heatmap/README.md)
 - [Regression coefficient and CI plot](./data_visualization/regression_coefficient_ci/README.md)
-- [Meta-analysis funnel plot](./meta_analysis_funnel_plot/README.md)
-- [Meta-analysis forest plot](./meta_analysis_forest_plot/README.md)
+- [Meta-analysis funnel plot](./data_visualization/meta_analysis_funnel_plot/README.md)
+- [Meta-analysis forest plot](./data_visualization/meta_analysis_forest_plot/README.md)
 
 ## Other
 
