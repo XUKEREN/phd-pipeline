@@ -3,6 +3,7 @@
 #
 sphinx>=4.3.1
 sphinx-book-theme==1.0.1
+sphinx_bootstrap_theme
 myst-nb
 sphinx-autodoc-typehints
 sphinx_copybutton

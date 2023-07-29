@@ -4,6 +4,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 import os
 import sys
+import sphinx_bootstrap_theme
 sys.path.insert(0, os.path.abspath('./')) # or "../../src
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -109,11 +110,12 @@ autodoc_type_aliases = {
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'sphinx_book_theme'
+html_theme = 'bootstrap'
 html_static_path = ['_static']
-html_theme_options = {
-    'show_toc_level': 2,
-    'repository_url': 'https://github.com/XUKEREN/phd-pipeline',
-    'use_repository_button': True,     # add a "link to repository" button
-}
+html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+#html_theme_options = {
+#    'show_toc_level': 2,
+#    'repository_url': 'https://github.com/XUKEREN/phd-pipeline',
+#    'use_repository_button': True,     # add a "link to repository" button
+#}
 
