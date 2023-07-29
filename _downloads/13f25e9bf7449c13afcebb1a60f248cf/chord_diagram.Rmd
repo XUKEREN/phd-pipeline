@@ -1,0 +1,120 @@
+---
+title: "deletion"
+author: "Keren Xu"
+date: "1/22/2020"
+output: 
+  rmarkdown::html_document:
+    toc: true  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(fig.width= 7, fig.height=5) 
+```
+
+# Load packages    
+```{r}
+library(tidyverse)
+library(tableone)
+library(knitr)
+library(scales)
+library(purrr)
+library(corrplot)
+library(broom)
+library(jtools)
+library(forcats)
+library(lmtest)
+library(ggplot2)
+library(patchwork)
+library(ggpubr)
+theme_set(theme_pubr()) 
+```
+
+# Chord diagram
+
+```{r, fig.width= 8, fig.height = 8}
+library(circlize)
+
+df = data.frame(
+  from = c(rep("deletion\n57.0%", 8), 
+           rep("no deletion\n43.0%", 8)), 
+  to = rep(c("CDKN2A", "IKZF1", "PAX5", "ETV6", "BTG1", "RB1", "PAR1", "EBF1"),2), 
+  value2 = c(58/271*162, 43/271*162, 45/271*162, 63/271*162, 19/271*162, 23/271*162, 17/271*162, 3/271*162, rep(15.25, 8)),
+  value = c(58, 43, 45, 63, 19, 23, 17, 3, 226, 241, 239, 221, 265, 261, 267, 281) )
+
+df2 <- rbind(
+c("CDKN2A", "IKZF1", 11),
+c("CDKN2A", "PAX5", 21),
+c("CDKN2A", "ETV6", 15),
+c("CDKN2A", "BTG1", 5),
+c("CDKN2A", "RB1", 6),
+c("CDKN2A", "PAR1", 5),
+c("CDKN2A", "EBF1", 1),
+
+c("IKZF1", "PAX5", 8),
+c("IKZF1", "ETV6", 4),
+c("IKZF1", "BTG1", 5),
+c("IKZF1", "RB1", 5),
+c("IKZF1", "PAR1", 6),
+c("IKZF1", "EBF1", 0),
+
+
+c("PAX5", "ETV6", 17),
+c("PAX5", "BTG1", 4),
+c("PAX5", "RB1", 6),
+c("PAX5", "PAR1", 4),
+c("PAX5", "EBF1", 0),
+
+
+c("ETV6", "BTG1", 10),
+c("ETV6", "RB1", 4),
+c("ETV6", "PAR1", 3),
+c("ETV6", "EBF1", 1),
+
+c("BTG1", "RB1", 3),
+c("BTG1", "PAR1", 3),
+c("BTG1", "EBF1", 1),
+
+c("RB1", "PAR1", 2),
+c("RB1", "EBF1", 1),
+
+c("PAR1", "EBF1", 1)
+) %>% 
+  data.frame() %>% 
+  rename(from = X1, to = X2, value = X3) %>% 
+  mutate(value2 = value) %>% 
+  mutate_at(c("value", "value2"), as.numeric)
+
+df3 <- rbind(df, df2)
+
+grid.col = c(
+  CDKN2A = "#FF0000", 
+  IKZF1 = "#00A08A", 
+  PAX5 = "#F2AD00", 
+  ETV6 = "#F98400", 
+  BTG1 = "#5BBCD6", 
+  RB1 = "#ECCBAE", 
+  PAR1 = "#046C9A", 
+  EBF1 = "#D69C4E", 
+  `deletion\n57.0%` = "#e5ebf7", 
+  `no deletion\n43.0%` = "#ececec")  
+
+circos.par(start.degree = 75)
+circos.par(gap.after = c(1, 10, rep(1, 7), 10))
+par(cex = 1.5)
+chordDiagram(
+  df3[, 1:4], 
+  grid.col = grid.col, 
+  link.visible = df3[[1]] != "no deletion\n43.0%", 
+  annotationTrack = c("name", "grid"), 
+  annotationTrackHeight = c(0.01, 0.03),  
+  directional = 2)
+
+title("EPIC", cex = 0.8)
+
+```
+
+
+

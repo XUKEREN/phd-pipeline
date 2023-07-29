@@ -265,7 +265,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
 </div></div>
       
     </div>
@@ -281,6 +283,17 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bioinformatics-pipelines">Bioinformatics pipelines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#association-studies">Association studies</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-visualization">Data visualization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other">Other</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -293,22 +306,46 @@ document.write(`
   <section class="tex2jax_ignore mathjax_ignore" id="phd-pipeline">
 <h1>phd-pipeline<a class="headerlink" href="#phd-pipeline" title="Permalink to this heading">#</a></h1>
 <p>Some workflows I wrote for my phd research projects:</p>
+<section id="bioinformatics-pipelines">
+<h2>Bioinformatics pipelines<a class="headerlink" href="#bioinformatics-pipelines" title="Permalink to this heading">#</a></h2>
 <ul class="simple">
-<li><p><a class="reference internal" href="cnv/README.html"><span class="doc std std-doc">CNV pipelines</span></a></p></li>
-<li><p><a class="reference internal" href="ewas/README.html"><span class="doc std std-doc">Epigenome-wide association study</span></a></p></li>
 <li><p><a class="reference internal" href="gatk_data_preprocessing/README.html"><span class="doc std std-doc">Data pre-processing for variant discovery GATK4</span></a></p></li>
 <li><p><a class="reference internal" href="gatk_germline_snp_indel/README.html"><span class="doc std std-doc">GATK4 germline short variant discovery (SNPs + Indels)</span></a></p></li>
-<li><p><a class="reference internal" href="gatk_mitochondria_snp_indel/README.html"><span class="doc std std-doc">Mitochondrial short variant discovery (SNVs + Indels)</span></a></p></li>
 <li><p><a class="reference internal" href="gatk_somatic_snv_indel/README.html"><span class="doc std std-doc">GATK4 call somatic snvs indels</span></a></p></li>
-<li><p><a class="reference internal" href="mediation_analysis/README.html"><span class="doc std std-doc">Causal mediation analysis</span></a></p></li>
-<li><p><a class="reference internal" href="meta_analysis_funnel_plot/README.html"><span class="doc std std-doc">Meta-analysis funnel plot</span></a></p></li>
-<li><p><a class="reference internal" href="mqtl/README.html"><span class="doc std std-doc">Methylation quantitative trait loci analysis</span></a></p></li>
-<li><p><a class="reference internal" href="mutational_signatures/README.html"><span class="doc std std-doc">Mutational signatures</span></a></p></li>
+<li><p><a class="reference internal" href="gatk_mitochondria_snp_indel/README.html"><span class="doc std std-doc">Mitochondrial short variant discovery (SNVs + Indels)</span></a></p></li>
 <li><p><a class="reference internal" href="sv/README.html"><span class="doc std std-doc">SV pipelines</span></a></p></li>
-<li><p><a class="reference internal" href="tableone/README.html"><span class="doc std std-doc">Create summary stats table</span></a></p></li>
+<li><p><a class="reference internal" href="cnv/README.html"><span class="doc std std-doc">CNV pipelines</span></a></p></li>
+<li><p><a class="reference internal" href="mutational_signatures/README.html"><span class="doc std std-doc">Mutational signatures</span></a></p></li>
 <li><p><a class="reference internal" href="telomere_length/README.html"><span class="doc std std-doc">Telomere length estimation</span></a></p></li>
+<li><p>[Eigenetic clock]</p></li>
+</ul>
+</section>
+<section id="association-studies">
+<h2>Association studies<a class="headerlink" href="#association-studies" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="ewas/README.html"><span class="doc std std-doc">Epigenome-wide association study</span></a></p></li>
+<li><p>[Genome-wide association study]</p></li>
+<li><p><a class="reference internal" href="mqtl/README.html"><span class="doc std std-doc">Methylation quantitative trait loci analysis</span></a></p></li>
+<li><p><a class="reference internal" href="mediation_analysis/README.html"><span class="doc std std-doc">Causal mediation analysis</span></a></p></li>
+<li><p><a class="reference internal" href="tableone/README.html"><span class="doc std std-doc">Create summary stats table</span></a></p></li>
+</ul>
+</section>
+<section id="data-visualization">
+<h2>Data visualization<a class="headerlink" href="#data-visualization" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="data_visualization/chord_diagram/README.html"><span class="doc std std-doc">Chord diagram</span></a></p></li>
+<li><p><a class="reference internal" href="data_visualization/heatmap/README.html"><span class="doc std std-doc">Correlation heatmap</span></a></p></li>
+<li><p><a class="reference internal" href="data_visualization/regression_coefficient_ci/README.html"><span class="doc std std-doc">Regression coefficient and CI plot</span></a></p></li>
+<li><p><a class="reference internal" href="meta_analysis_funnel_plot/README.html"><span class="doc std std-doc">Meta-analysis funnel plot</span></a></p></li>
+<li><p><span class="xref myst">Meta-analysis forest plot</span></p></li>
+</ul>
+</section>
+<section id="other">
+<h2>Other<a class="headerlink" href="#other" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
 <li><p><a class="reference internal" href="year_one_screening_exam/README.html"><span class="doc std std-doc">Year one screening exam</span></a></p></li>
 </ul>
+</section>
 </section>
 
 
@@ -332,6 +369,23 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bioinformatics-pipelines">Bioinformatics pipelines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#association-studies">Association studies</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-visualization">Data visualization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other">Other</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
