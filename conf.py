@@ -103,13 +103,12 @@ autodoc_type_aliases = {
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
-html_theme = 'alabaster'
+
+html_theme = 'sphinx_book_theme'
 html_static_path = ['_static']
-# don't include docstrings from the parent class
-autodoc_inherit_docstrings = False
-# Show types only in descriptions, not in signatures
-autodoc_typehints = "description"
-# html_theme = 'sphinx_book_theme'
 html_theme_options = {
+    'show_toc_level': 2,
+    'repository_url': 'https://github.com/tempuslabs/bioinf-analysis-utils',
     'use_repository_button': True,     # add a "link to repository" button
 }
+
