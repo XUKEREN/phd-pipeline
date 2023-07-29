@@ -1,16 +1,16 @@
-# phd-pipeline  
+# phd-pipeline
 
-Some workflows I wrote for my phd research projects:  
+Some workflows I wrote for my phd research projects:
 
 - [CNV pipelines](./cnv/README.md)
-- [Epigenome-wide association study](./ewas)
+- [Epigenome-wide association study](./ewas/README.md)
 - [Data pre-processing for variant discovery GATK4](./gatk_data_preprocessing/README.md)
 - [GATK4 germline short variant discovery (SNPs + Indels)](./gatk_germline_snp_indel/README.md)
 - [Mitochondrial short variant discovery (SNVs + Indels)](./gatk_mitochondria_snp_indel/README.md)
 - [GATK4 call somatic snvs indels](./gatk_somatic_snv_indel/README.md)
-- [Mediation analysis](./mediation_analysis)
+- [Causal mediation analysis](./mediation_analysis/README.md)
 - [Meta-analysis funnel plot](./meta_analysis_funnel_plot/README.md)
-- [Methylation quantitative trait loci analysis](./mqtl)
+- [Methylation quantitative trait loci analysis](./mqtl/README.md)
 - [Mutational signatures](./mutational_signatures/README.md)
 - [SV pipelines](./sv/README.md)
 - [Create summary stats table](./tableone/README.md)
