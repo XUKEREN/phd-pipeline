@@ -32,6 +32,7 @@ Some workflows I wrote for my phd research projects:
 - [Sample flow chart](./data_visualization/sample_flow_chart/README.md)
 - [t-test boxplot](./data_visualization/ttest_boxplot/README.md)
 - [Bidirectional Manhattan plot and QQ plot](./ewas/README.md)
+- [SNP CpG association]
 
 ## Other
 
