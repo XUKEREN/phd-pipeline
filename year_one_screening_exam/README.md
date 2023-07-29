@@ -2,8 +2,8 @@
 
 ## apply exam - regression estimation and prediction
 
-- [sas codes](./apply/)
+- [sas codes](https://github.com/XUKEREN/phd-pipeline/tree/main/year_one_screening_exam/apply)
 
 ## theory - epidemiology
 
-- [spider diagram](./theory/)
+- [spider diagram](https://github.com/XUKEREN/phd-pipeline/tree/main/year_one_screening_exam/theory)
