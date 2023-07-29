@@ -108,7 +108,7 @@ html_theme = 'sphinx_book_theme'
 html_static_path = ['_static']
 html_theme_options = {
     'show_toc_level': 2,
-    'repository_url': 'https://github.com/XUKEREN/phd-pipeline',
+    'repository_url': 'https://github.com/tempuslabs/bioinf-analysis-utils',
     'use_repository_button': True,     # add a "link to repository" button
 }
 
