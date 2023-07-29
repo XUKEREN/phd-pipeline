@@ -1,0 +1,74 @@
+---
+title: "heatmap"
+author: "KerenXu"
+date: "1/5/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+library(tidyverse)
+```
+
+# load in dataset 
+```{r}
+melted_cormat <- tribble(
+       ~Var1,   ~Var2, ~value, 
+  "Haftorn clock", "Haftorn clock",      176,
+   "Bohlin clock", "Bohlin clock",      96,
+   "Knight clock", "Knight clock",      148,
+  "DNAmSkinBloodClock", "DNAmSkinBloodClock",      391,
+   "DNAmAge", "DNAmAge",      353,
+  "Bohlin clock",  "Haftorn clock",     11,
+      "Haftorn clock",  "Knight clock",   0,
+    "Bohlin clock", "Knight clock",      2,
+   "DNAmSkinBloodClock",  "Haftorn clock",    0,
+    "DNAmAge", "Haftorn clock",     0,
+   "DNAmSkinBloodClock",  "Knight clock",     1,
+    "DNAmAge",  "Knight clock",    6,
+     "Bohlin clock", "DNAmSkinBloodClock",      1,
+   "Bohlin clock", "DNAmAge",      1,
+  "DNAmAge",  "DNAmSkinBloodClock",     60
+)
+```
+
+
+# create a heatmap for the overlapping CpGs
+```{r, fig.width= 6, fig.height = 4}
+ggheatmap <- ggplot(melted_cormat, aes(Var2, Var1, fill = value)) +
+  geom_tile(color = "black", fill = NA, size = 0.2) +
+  theme_minimal() + # minimal theme
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.text.y = element_text(angle = 0, hjust = 1)) +
+  coord_fixed() + 
+  scale_x_discrete(expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) + 
+  coord_equal() 
+
+ggheatmap + 
+  geom_text(
+    aes(melted_cormat$Var2, melted_cormat$Var1, 
+        label = paste(format(melted_cormat$value,2))), 
+    color = "black", size = 2.5, angle = 0) + 
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    axis.ticks = element_blank(),
+    legend.justification = c(1, 0),
+    legend.position = c(0.6, 0.7),
+    legend.direction = "horizontal",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.y = element_text(angle = 0, hjust = 1)) +
+  guides(
+    fill = guide_colorbar(barwidth = 7, 
+                          barheight = 1,
+                          title.position = "top", 
+                          title.hjust = 0.5, 
+                          title = "PRS\nSpearman Correlation")) + 
+  scale_y_discrete(position = "right") 
+```
+
+
