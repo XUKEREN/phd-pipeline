@@ -17,7 +17,7 @@ This workflow was written according to the following GATK official WDLs:
 ## The main steps in the preprocessing workflow. A figure from GITC.
 
 <p align="center">
-<img src='MainStepsInPreprocessingWorkflow.png' width='250'>
+<img src='../_static/MainStepsInPreprocessingWorkflow.png' width='250'>
 </p>
 
 ## Step 0: QC

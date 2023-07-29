@@ -28,7 +28,7 @@ Check out gatk doc for more details on GATK4 Mutect2:
 ## Best practices for somatic short variant discovery. A figure from GITC.
 
 <p align="center">
-<img src='M2_workflow.png' width='400'>
+<img src='../_static/M2_workflow.png' width='400'>
 </p>
 
 # Step 1: Scatter interval for Mutect2 parallel calling  
