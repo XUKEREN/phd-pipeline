@@ -1,0 +1,12 @@
+# Install the documentation requirements with:
+#     pip install -r requirements.txt
+#
+sphinx>=4.3.1
+sphinx-book-theme==1.0.1
+myst-nb
+sphinx-autodoc-typehints
+sphinx_copybutton
+sphinx_design
+sphinx-remove-toctrees
+jupyter-sphinx
+matplotlib
