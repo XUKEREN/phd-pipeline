@@ -8,9 +8,9 @@ Three epigenetic gestational age clocks (Bohlin et al., 2016; Haftorn et al., 20
 
 - Study publication: [link](https://onlinelibrary.wiley.com/doi/full/10.1111/acel.13652)
 - A full list of CpGs and their weight can be found here: [link](https://github.com/XUKEREN/phd-pipeline/tree/main/epigenetic_clock)
-- Script to calculate epigenetic clocks: [link](./epigenetic_clock.R)
-- Script to generate a heatmap of overlapping CpGs: [link](./heatmap_cpg.Rmd)
-- Script for correlation plots: [link](./ga_clock_corr.Rmd)
+- [epigenetic_clock.R](./epigenetic_clock.R) calculates epigenetic clocks
+- [heatmap_cpg.R](./heatmap_cpg.Rmd) generates a heatmap of overlapping CpGs
+- [ga_clock_corr.Rmd](./ga_clock_corr.Rmd) generates correlation plots
 
 <p align="center">
 <img src='../_static/heatmap_overlapping_cpg.png' width='800'>
