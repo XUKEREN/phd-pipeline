@@ -1,0 +1,248 @@
+---
+title: "smartpca_plot"
+author: "Keren Xu"
+date: "5/6/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(fig.width= 7, fig.height=5) 
+```
+
+# load packages 
+```{r}
+library(tidyverse)
+library(tableone)
+library(knitr)
+library(scales)
+library(purrr)
+library(corrplot)
+library(broom)
+library(jtools)
+library(forcats)
+library(lmtest)
+library(ggplot2)
+library(patchwork)
+library(ggpubr)
+library(data.table)
+library(ggpubr)
+require(foreign)
+require(nnet)
+require(ggplot2)
+require(reshape2)
+library(pals)
+theme_set(theme_pubr()) 
+```
+
+# load dataset 
+```{r}
+snp6_eigenvec <- fread("cog9904_9905_snp6_1000G.evec", header = F)
+snp5_eigenvec <- fread("cog9906_500K_1000G.evec", header = F)
+snp6_eigenval <- fread("cog9904_9905_snp6_1000G.eval", header = F)
+snp5_eigenval <- fread("cog9906_500K_1000G.eval", header = F)
+```
+
+# unsupervised cv10 error 
+```{r, fig.width= 6, fig.height = 6 }
+# Libraries
+library(ggplot2)
+library(hrbrthemes)
+
+# Plot
+snp5_eigenval[1:20] %>% rownames_to_column("PC") %>% mutate(PC = as.numeric(PC)) %>% ggplot(aes(x=PC, y=V1)) +
+  geom_line( color="#69b3a2", size=2, alpha=0.9) +
+  geom_point(size = 2) + 
+  theme_ipsum() +
+  labs(
+    title = "eigenvalue of each principal component",
+    subtitle = "1000G (n = 2,504) + 500K (n = 216)",
+    y = "eigenvalue",
+    x = "# of PC"
+  ) 
+
+
+snp6_eigenval[1:20] %>% rownames_to_column("PC") %>% mutate(PC = as.numeric(PC)) %>% ggplot(aes(x=PC, y=V1)) +
+  geom_line( color="#69b3a2", size=2, alpha=0.9) +
+  geom_point(size = 2) + 
+  theme_ipsum() +
+  labs(
+    title = "eigenvalue of each principal component",
+    subtitle = "1000G (n = 2,504) + AFFY 6.0 (n = 1,583)",
+    y = "eigenvalue",
+    x = "# of PC"
+  ) 
+
+```
+
+
+# 500K 
+```{r, fig.width= 8, fig.height = 6}
+tbl <- snp5_eigenvec
+pop <- fread("../pop_500K_1000G.txt")  
+df <- cbind(pop, tbl)
+df <- df %>% mutate(SuperPop = ifelse(SuperPop == "", "500K", SuperPop)) %>% arrange(SuperPop, race) 
+
+
+df %>% ggplot(aes(x = V2, y = V3, color = SuperPop)) + geom_point(shape = 3) + xlab("pc1") + ylab("pc2")+
+  scale_color_manual(values=as.vector(rainbow(6))) +
+  theme_minimal(base_family = "Roboto Condensed") + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    legend.position = "right"
+    )
+
+df %>% ggplot(aes(x = V2, y = V4, color = SuperPop)) + geom_point(shape = 3) + xlab("pc1") + ylab("pc3")+
+  scale_color_manual(values=as.vector(rainbow(6)))  +
+  theme_minimal(base_family = "Roboto Condensed") + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    legend.position = "right"
+    )
+
+df %>% ggplot(aes(x = V3, y = V4, color = SuperPop)) + geom_point(shape = 3) + xlab("pc2") + ylab("pc3")+
+  scale_color_manual(values=as.vector(rainbow(6)))  +
+  theme_minimal(base_family = "Roboto Condensed") + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    legend.position = "right"
+    )
+
+df %>% ggplot(aes(x = V2, y = V5, color = SuperPop)) + geom_point(shape = 3) + xlab("pc1") + ylab("pc4")+
+  scale_color_manual(values=as.vector(rainbow(6)))  +
+  theme_minimal(base_family = "Roboto Condensed") + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    legend.position = "right"
+    )
+
+df %>% ggplot(aes(x = V3, y = V5, color = SuperPop)) + geom_point(shape = 3) + xlab("pc2") + ylab("pc4")+
+  scale_color_manual(values=as.vector(rainbow(6)))  +
+  theme_minimal(base_family = "Roboto Condensed") + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    legend.position = "right"
+    )
+
+
+```
+
+
+# individual lines  
+```{r, fig.width= 10, fig.height = 6}
+df %>% 
+  filter(race == "") %>% 
+  rename("PC1" = "V2", "PC2" = "V3", "PC3" = "V4", "PC4" = "V5", "PC5" = "V6", "PC6" = "V7", "PC7" = "V8", "PC8" = "V9", "PC9" = "V10", "PC10" = "V11") %>% 
+  pivot_longer(c("PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10"), names_to = "PC", values_to = "value") %>% 
+  mutate(PC = factor(PC, c("PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")), SuperPop = factor(SuperPop, c("EUR", "AFR", "AMR", "EAS", "SAS"))) %>% 
+  ggplot() + 
+  geom_line(aes(x = PC, y = value, color = SuperPop, group = sample_id), size = 1) + 
+  scale_color_manual(values=as.vector(rainbow(5))) + 
+  guides(color=guide_legend(title="SuperPop in 1KGP")) + 
+  labs(
+    y = "Eigenvalues",
+    x = "Eigenvectors "
+  )  +
+  theme_minimal(base_family = "Roboto Condensed") + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    legend.position = "bottom"
+    )
+
+
+```
+
+# snp6 
+```{r, fig.width= 8, fig.height = 6}
+
+tbl <- snp6_eigenvec
+pop <- fread("../pop_snp6_1000G.txt")  
+df <- cbind(pop, tbl)
+df <- df %>% mutate(SuperPop = ifelse(SuperPop == "", "AFFY 6.0", SuperPop)) %>% arrange(SuperPop, race) 
+
+
+df %>% ggplot(aes(x = V2, y = V3, color = SuperPop)) + geom_point(shape = 3) + xlab("pc1") + ylab("pc2")+
+  scale_color_manual(values=as.vector(rainbow(6))) +
+  theme_minimal(base_family = "Roboto Condensed") + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    legend.position = "right"
+    )
+
+df %>% ggplot(aes(x = V2, y = V4, color = SuperPop)) + geom_point(shape = 3) + xlab("pc1") + ylab("pc3")+
+  scale_color_manual(values=as.vector(rainbow(6))) +
+  theme_minimal(base_family = "Roboto Condensed") + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    legend.position = "right"
+    )
+
+df %>% ggplot(aes(x = V3, y = V4, color = SuperPop)) + geom_point(shape = 3) + xlab("pc2") + ylab("pc3")+
+  scale_color_manual(values=as.vector(rainbow(6))) +
+  theme_minimal(base_family = "Roboto Condensed") + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    legend.position = "right"
+    )
+
+df %>% ggplot(aes(x = V2, y = V5, color = SuperPop)) + geom_point(shape = 3) + xlab("pc1") + ylab("pc4")+
+  scale_color_manual(values=as.vector(rainbow(6))) +
+  theme_minimal(base_family = "Roboto Condensed") + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    legend.position = "right"
+    )
+
+
+df %>% ggplot(aes(x = V3, y = V5, color = SuperPop)) + geom_point(shape = 3) + xlab("pc2") + ylab("pc4")+
+  scale_color_manual(values=as.vector(rainbow(6)))  +
+  theme_minimal(base_family = "Roboto Condensed") + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    legend.position = "right"
+    )
+
+```
+
+
+
+# individual lines  
+```{r, fig.width= 10, fig.height = 6}
+df %>% filter(race == "") %>% rename("PC1" = "V2", "PC2" = "V3", "PC3" = "V4", "PC4" = "V5", "PC5" = "V6", "PC6" = "V7", "PC7" = "V8", "PC8" = "V9", "PC9" = "V10", "PC10" = "V11") %>% pivot_longer(c("PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10"), names_to = "PC", values_to = "value") %>% mutate(PC = factor(PC, c("PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10")), SuperPop = factor(SuperPop, c("EUR", "AFR", "AMR", "EAS", "SAS"))) %>% ggplot() + geom_line(aes(x = PC, y = value, color = SuperPop, group = sample_id), size = 1) + scale_color_manual(values=as.vector(rainbow(5)))  + guides(color=guide_legend(title="SuperPop in 1KGP")) + 
+  labs(
+    y = "Eigenvalues",
+    x = "Eigenvectors "
+  )  +
+  theme_minimal(base_family = "Roboto Condensed") + theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    legend.position = "bottom"
+    )
+```
+

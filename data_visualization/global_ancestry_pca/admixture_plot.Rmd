@@ -1,0 +1,308 @@
+---
+title: "admixture_plot"
+author: "Keren Xu"
+date: "5/6/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(fig.width= 7, fig.height=5) 
+```
+
+# load packages 
+```{r}
+library(tidyverse)
+library(tableone)
+library(knitr)
+library(scales)
+library(purrr)
+library(corrplot)
+library(broom)
+library(jtools)
+library(forcats)
+library(lmtest)
+library(ggplot2)
+library(patchwork)
+library(ggpubr)
+library(data.table)
+library(ggpubr)
+require(foreign)
+require(nnet)
+require(ggplot2)
+require(reshape2)
+library(pals)
+theme_set(theme_pubr()) 
+```
+
+
+# unsupervised cv10 error 
+```{r, dev = 'CairoPNG'}
+cv_error_500K <- rbind(
+  c(K=1, CV_error = 0.48662),
+  c(K=2,  CV_error = 0.43451),
+  c(K=3, CV_error = 0.41697),
+  c(K=4, CV_error = 0.41337),
+  c(K=5, CV_error = 0.40925)
+)%>% data.frame()
+
+cv_error_snp6 <- rbind(
+  c(K=1, CV_error = 0.41887),
+  c(K=2,  CV_error = 0.37544),
+  c(K=3, CV_error = 0.36065),
+  c(K=4, CV_error = 0.35761),
+  c(K=5, CV_error = 0.35467)
+) %>% data.frame()
+
+
+# Libraries
+library(ggplot2)
+library(hrbrthemes)
+
+# Plot
+cv_error_500K %>% ggplot(aes(x=K, y=CV_error)) +
+  geom_line( color="#69b3a2", size=2, alpha=0.9) +
+  geom_point(size = 2) + 
+  theme_ipsum() +
+  ggtitle("10-fold Cross−validation error (500K + 1000G)")
+
+
+cv_error_snp6 %>% ggplot(aes(x=K, y=CV_error)) +
+  geom_line( color="#69b3a2", size=2, alpha=0.9) +
+  geom_point(size = 2) + 
+  theme_ipsum() +
+  ggtitle("10-fold Cross−validation error (6.0 + 1000G)")
+```
+
+
+# 500K K = 5
+```{r, fig.width= 15, fig.height = 8}
+
+tbl=read.table("cog9906_500K_1000G.5.Q")
+pop <- fread("pop_500K_1000G.txt")  
+
+df <- cbind(pop, tbl)
+df2 <- df %>% select(c("sample_id", "SuperPop", "Population","race","V1", "V2", "V3", "V4", "V5")) %>% rename( "K1"= "V1","K2"="V2", "K3"="V3","K4"= "V4", "K5"="V5")
+
+df_longer <- df2 %>% pivot_longer(cols = c("K1", "K2", "K3", "K4", "K5"), names_to ="Ancestry group", values_to = "Ancestry proportion") 
+
+df_longer <- df_longer %>% mutate(SuperPop = ifelse(SuperPop == "", "500K", SuperPop)) %>% arrange(SuperPop, race)
+
+
+ggplot(df_longer, aes(fill= factor(`Ancestry group`, levels = c("K1", "K2", "K3", "K4", "K5"
+)), y=`Ancestry proportion`, x=reorder(
+sample_id, SuperPop))) + 
+    geom_bar(position="stack", stat="identity") + labs(fill="Ancestry group \n (K = 5)") +
+  scale_fill_manual(values=as.vector(rainbow(5))) + facet_grid(cols = vars(SuperPop), scales = "free_x", switch = "x", space = "free_x") + 
+  labs(
+    title = "Ancestry proportion from ADMIXTURE unsupervised learning 10 fold CV K = 5",
+    subtitle = "1000G (n = 2,504) + 500K (n = 216)",
+    y = "Ancestry proportion",
+    x = "Individual #"
+  ) +
+  theme_minimal(base_family = "Roboto Condensed") +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    strip.text.x = element_text(angle = 90, face = "bold", size = 10),
+    strip.placement = "outside",
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.text.x = element_blank(),
+    axis.text = element_text(size = 10),
+    legend.position = "right",
+    panel.grid = element_blank()
+    )
+
+```
+
+
+```{r, fig.width= 12, fig.height = 8}
+
+df_longer %>% filter(SuperPop == "500K") %>% ggplot(aes(fill= factor(`Ancestry group`, levels = c("K1", "K2", "K3", "K4", "K5"
+)), y=`Ancestry proportion`, x=reorder(
+sample_id, SuperPop))) + 
+    geom_bar(position="stack", stat="identity") + labs(fill="Ancestry group \n (K = 5)") +
+  scale_fill_manual(values=as.vector(rainbow(5))) + facet_grid(cols = vars(race), scales = "free_x", switch = "x", space = "free_x") + 
+  labs(
+    title = "500K zoom in (n = 216)",
+    y = "Ancestry proportion",
+    x = "Individual #"
+  ) +
+  theme_minimal(base_family = "Roboto Condensed") +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    strip.text.x = element_text(angle = 90, face = "bold", size = 10),
+    strip.placement = "outside",
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.text.x = element_blank(),
+    axis.text = element_text(size = 10),
+    legend.position = "right",
+    panel.grid = element_blank()
+    )
+```
+
+
+```{r}
+df %>% filter(SuperPop != "") %>% count(SuperPop) 
+df %>% filter(race != "") %>% count(race)
+
+EUR <- df %>% filter(SuperPop != "") %>% group_by(SuperPop) %>% summarize(n = n(),min_EUR = min(V1), max_EUR = max(V1))
+AMR <- df %>% filter(SuperPop != "") %>% group_by(SuperPop) %>% summarize(n = n(),min_AMR = min(V2), max_AMR = max(V2))
+SAS <- df %>% filter(SuperPop != "") %>% group_by(SuperPop) %>% summarize(n = n(),min_SAS = min(V3), max_SAS = max(V3))
+AFR <- df %>% filter(SuperPop != "") %>% group_by(SuperPop) %>% summarize(n = n(),min_AFR = min(V4), max_AFR = max(V4))
+EAS <- df %>% filter(SuperPop != "") %>% group_by(SuperPop) %>% summarize(n = n(),min_EAS = min(V5), max_EAS = max(V5))
+
+EUR %>% left_join(AMR)%>% left_join(SAS)%>% left_join(AFR)%>% left_join(EAS) %>% kable()
+
+EUR <-  df%>% filter(race != "") %>% group_by(race) %>% summarize(n = n(),min_EUR = min(V1), max_EUR = max(V1))
+AMR <- df%>% filter(race != "") %>% group_by(race) %>% summarize(n = n(),min_AMR = min(V2), max_AMR = max(V2))
+SAS <- df%>% filter(race != "") %>% group_by(race) %>% summarize(n = n(),min_SAS = min(V3), max_SAS = max(V3))
+AFR <-df%>% filter(race != "") %>% group_by(race) %>% summarize(n = n(),min_AFR = min(V4), max_AFR = max(V4))
+EAS <- df%>% filter(race != "") %>% group_by(race) %>% summarize(n = n(),min_EAS = min(V5), max_EAS = max(V5))
+EUR %>% left_join(AMR)%>% left_join(SAS)%>% left_join(AFR)%>% left_join(EAS) %>% kable()
+
+
+df %>% filter(race != "") %>% filter(V1 >= 0.9) %>% count(race) %>% mutate(platform = "500K", threshold = 0.9)
+df %>% filter(race != "") %>% filter(V1 >= 0.85) %>% count(race)%>% mutate(platform = "500K", threshold = 0.85)
+df %>% filter(race != "") %>% filter(V1 >= 0.8) %>% count(race)%>% mutate(platform = "500K", threshold = 0.80)
+
+```
+
+
+# SNP6
+```{r, fig.width= 15, fig.height = 8}
+
+tbl=read.table("cog9904_9905_snp6_1000G.5.Q")
+pop <- fread("pop_snp6_1000G.txt")  
+df <- cbind(pop, tbl)
+df2 <- df %>% select(c("sample_id", "SuperPop", "Population","race","V1", "V2", "V3", "V4", "V5"))%>% rename( "K1"= "V1","K2"="V2", "K3"="V3","K4"= "V4", "K5"="V5")
+
+df_longer <- df2 %>% pivot_longer(cols = c("K1", "K2", "K3", "K4", "K5"), names_to ="Ancestry group", values_to = "Ancestry proportion")
+
+df_longer <- df_longer %>% mutate(SuperPop = ifelse(SuperPop == "", "AFFY 6.0", SuperPop)) %>% arrange(SuperPop, race)  
+
+
+ggplot(df_longer, aes(fill= factor(`Ancestry group`, levels = c("K2", "K3","K1", "K4", "K5"
+)), y=`Ancestry proportion`, x=reorder(
+sample_id, SuperPop))) + 
+    geom_bar(position="stack", stat="identity") + labs(fill="Ancestry group \n (K = 5)") +
+  scale_fill_manual(values=as.vector(rainbow(5))) + facet_grid(cols = vars(SuperPop), scales = "free_x", switch = "x", space = "free_x") + 
+  labs(
+    title = "Ancestry proportion from ADMIXTURE unsupervised learning 10 fold CV K = 5",
+    subtitle = "1000G (n = 2,504) + AFFY 6.0 (n = 1,583)",
+    y = "Ancestry proportion",
+    x = "Individual #"
+  ) +
+  theme_minimal(base_family = "Roboto Condensed") +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    strip.text.x = element_text(angle = 90, face = "bold",size = 10),
+    strip.placement = "outside",
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.text.x = element_blank(),
+    axis.text = element_text(size = 10),
+    legend.position = "right",
+    panel.grid = element_blank()
+    )
+
+
+
+
+df_longer %>% filter(SuperPop == "AFFY 6.0") %>% ggplot(aes(fill= factor(`Ancestry group`, levels = c("K2", "K3","K1", "K4", "K5"
+)), y=`Ancestry proportion`, x=reorder(
+sample_id, SuperPop))) + 
+    geom_bar(position="stack", stat="identity") + labs(fill="Ancestry group \n (K = 5)") +
+  scale_fill_manual(values=as.vector(rainbow(5))) + facet_grid(cols = vars(race), scales = "free_x", switch = "x", space = "free_x") + 
+  labs(
+    title = "AFFY 6.0 zoom in (n = 1,583)",
+    y = "Ancestry proportion",
+    x = "Individual #"
+  ) +
+  theme_minimal(base_family = "Roboto Condensed") +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 15, face = "bold"),
+    strip.text.x = element_text(angle = 90, face = "bold", size = 10),
+    strip.placement = "outside",
+    axis.title.y = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.title.x = element_text(margin = margin(t = 0.5, b = 0.5, unit = "cm")),
+    axis.text.x = element_blank(),
+    axis.text = element_text(size = 10),
+    legend.position = "right",
+    panel.grid = element_blank()
+    )
+
+```
+
+
+```{r}
+df %>% filter(SuperPop != "") %>% count(SuperPop) 
+df %>% filter(race != "") %>% count(race)
+
+EUR <- df %>% filter(SuperPop != "") %>% group_by(SuperPop) %>% summarize(n = n(), min_EUR = min(V2), max_EUR = max(V2))
+AMR <- df %>% filter(SuperPop != "") %>% group_by(SuperPop) %>% summarize(n = n(),min_AMR = min(V3), max_AMR = max(V3))
+SAS <- df %>% filter(SuperPop != "") %>% group_by(SuperPop) %>% summarize(n = n(),min_SAS = min(V1), max_SAS = max(V1))
+AFR <- df %>% filter(SuperPop != "") %>% group_by(SuperPop) %>% summarize(n = n(),min_AFR = min(V4), max_AFR = max(V4))
+EAS <- df %>% filter(SuperPop != "") %>% group_by(SuperPop) %>% summarize(n = n(),min_EAS = min(V5), max_EAS = max(V5))
+
+EUR %>% left_join(AMR)%>% left_join(SAS)%>% left_join(AFR)%>% left_join(EAS) %>% kable()
+
+EUR <- df%>% filter(race != "") %>% group_by(race) %>% summarize(n = n(),min_EUR = min(V2), max_EUR = max(V2))
+AMR <-  df%>% filter(race != "") %>% group_by(race) %>% summarize(n = n(),min_AMR = min(V3), max_AMR = max(V3))
+SAS <-  df%>% filter(race != "") %>% group_by(race) %>% summarize(n = n(),min_SAS = min(V1), max_SAS = max(V1))
+AFR <-  df%>% filter(race != "") %>% group_by(race) %>% summarize(n = n(),min_AFR = min(V4), max_AFR = max(V4))
+EAS <-  df%>% filter(race != "") %>% group_by(race) %>% summarize(n = n(),min_EAS = min(V5), max_EAS = max(V5))
+
+EUR %>% left_join(AMR)%>% left_join(SAS)%>% left_join(AFR)%>% left_join(EAS) %>% kable()
+
+df %>% filter(race != "") %>% filter(V2 >= 0.9) %>% count(race)
+df %>% filter(race != "") %>% filter(V2 >= 0.85) %>% count(race)
+df %>% filter(race != "") %>% filter(V2 >= 0.8) %>% count(race)
+
+# 974
+# 1016
+# 1040
+```
+
+# create list 
+```{r}
+tbl=read.table("cog9906_500K_1000G.5.Q")
+pop <- fread("pop_500K_1000G.txt")  
+
+df_500K <- cbind(pop, tbl)
+df_500K <- df_500K %>% select(c("sample_id", "SuperPop", "Population","race","V1", "V2", "V3", "V4", "V5"))
+
+tbl=read.table("cog9904_9905_snp6_1000G.5.Q")
+pop <- fread("pop_snp6_1000G.txt") 
+df_snp6 <- cbind(pop, tbl)
+df_snp6 <- df_snp6 %>% select(c("sample_id", "SuperPop", "Population","race","V1", "V2", "V3", "V4", "V5"))
+
+
+c(
+ df_500K %>% filter(race !="") %>% filter(V1 >= 0.9) %>% pull(sample_id), 
+ df_snp6 %>% filter(race !="") %>% filter(V2 >= 0.9) %>% pull(sample_id)
+
+) %>% data.frame() %>% fwrite("cog_eur_90_per.txt", col.names = F)
+
+
+c(
+ df_500K %>% filter(race !="") %>% filter(V1 >= 0.85) %>% pull(sample_id), 
+ df_snp6 %>% filter(race !="") %>% filter(V2 >= 0.85) %>% pull(sample_id)
+
+) %>% data.frame() %>% fwrite("cog_eur_85_per.txt", col.names = F)
+
+c(
+ df_500K %>% filter(race !="") %>% filter(V1 >= 0.80) %>% pull(sample_id), 
+ df_snp6 %>% filter(race !="") %>% filter(V2 >= 0.80) %>% pull(sample_id)
+
+) %>% data.frame() %>% fwrite("cog_eur_80_per.txt", col.names = F)
+
+```
+
