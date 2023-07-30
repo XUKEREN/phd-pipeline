@@ -1,6 +1,6 @@
 # Regression coefficients and CIs
 
-This is a script to create a plot that shows regression coefficients and CIs from multiple regressions.
+This is a script to create a plot that shows multiple linear regressions results for the associations of parental self-reported tobacco smoke exposures with DNA methylation at the AHRR CpG cg05575921 and with the polyepigenetic smoking score.
 
 - Study publication: [link](https://aacrjournals.org/cebp/article/30/8/1517/671018/Epigenetic-Biomarkers-of-Prenatal-Tobacco-Smoke)
 - Script: [link](./regression_plot.Rmd)

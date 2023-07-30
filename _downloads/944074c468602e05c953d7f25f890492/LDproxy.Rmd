@@ -1,0 +1,46 @@
+---
+title: "LDproxy"
+author: "Keren Xu"
+date: "7/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggpubr)
+theme_set(theme_light())
+```
+
+```{r}
+library(haploR)
+library(tidyverse)
+library(data.table)
+library(ggplot2)
+
+rs78396808 <- fread("proxy34387_rs78396808.txt")
+rs6421315 <- fread("proxy75653_rs6421315.txt")
+
+df_rs78396808 <- rs78396808 %>% select(RS_Number, R2) %>% rename("R2_rs78396808" = "R2")
+df_rs6421315 <- rs6421315 %>% select(RS_Number, R2) %>% rename("R2_rs6421315" = "R2")
+df_total <- df_rs78396808 %>% filter(RS_Number != ".") %>% inner_join(df_rs6421315, by = "RS_Number") 
+
+rs78396808 %>% filter(RS_Number == ".")%>% filter(!is.na(Correlated_Alleles))
+rs6421315 %>% filter(RS_Number == ".")%>% filter(!is.na(Correlated_Alleles))
+```
+
+```{r, fig.width= 6, fig.height = 5}
+df_total %>% ggplot(aes(x = R2_rs78396808, y = R2_rs6421315)) + 
+  geom_point(
+        color="black",
+        fill="grey",
+        shape=21,
+        alpha=0.5,
+        size=2
+        ) + 
+  labs(
+    x = bquote('AMR'~R^2~'with rs78396808'), 
+    y = bquote('EUR'~R^2~'with rs6421315')) + 
+  scale_x_continuous(limits = c(0, 1)) + 
+  scale_y_continuous(limits = c(0,1))
+```
+

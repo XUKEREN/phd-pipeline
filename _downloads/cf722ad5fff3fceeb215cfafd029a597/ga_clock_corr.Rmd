@@ -1,0 +1,551 @@
+---
+title: "Methylation clock"
+author: "Keren Xu"
+date: "08/03/2021"
+output: 
+  rmarkdown::html_document:
+    toc: true  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(fig.width= 7, fig.height=5) 
+```
+
+# Load packages    
+```{r}
+library(tidyverse)
+library(tableone)
+library(knitr)
+library(scales)
+library(purrr)
+library(corrplot)
+library(broom)
+library(jtools)
+library(forcats)
+library(lmtest)
+library(ggplot2)
+library(patchwork)
+library(ggpubr)
+library(data.table)
+library(ggpubr)
+require(foreign)
+require(nnet)
+require(ggplot2)
+require(reshape2)
+library(ggthemes)
+library(ggbeeswarm)
+library(openxlsx)
+theme_set(theme_pubr()) 
+```
+
+# correlation between gestational age and Haftorn clock in everyone, in DS, and in non-DS people 
+```{r, fig.width= 12, fig.height = 4}
+# check sample size
+mydata_cleaned %>% filter(!is.na(gestation_day_merged)&!is.na(Haftorn_clock)) %>% dim() %>% .[1]
+mydata_cleaned %>% filter(peri_dsal=="dsal") %>% filter(!is.na(gestation_day_merged)&!is.na(Haftorn_clock)) %>% dim() %>% .[1]
+mydata_cleaned %>% filter(peri_dsal=="peri") %>% filter(!is.na(gestation_day_merged)&!is.na(Haftorn_clock)) %>% dim() %>% .[1]
+
+# spearman correlation tests 
+cor.test(mydata_cleaned$gestation_day_merged, mydata_cleaned$Haftorn_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned$gestation_day_merged, mydata_cleaned$Haftorn_clock, method = "spearman")$p.value 
+cor.test(mydata_cleaned%>%filter(peri_dsal=="dsal") %>% .$gestation_day_merged, mydata_cleaned%>%filter(peri_dsal=="dsal") %>%.$Haftorn_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned%>%filter(peri_dsal=="dsal") %>% .$gestation_day_merged, mydata_cleaned%>%filter(peri_dsal=="dsal") %>%.$Haftorn_clock, method = "spearman")$p.value
+cor.test(mydata_cleaned%>%filter(peri_dsal=="peri") %>% .$gestation_day_merged, mydata_cleaned%>%filter(peri_dsal=="peri") %>%.$Haftorn_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned%>%filter(peri_dsal=="peri") %>% .$gestation_day_merged, mydata_cleaned%>%filter(peri_dsal=="peri") %>%.$Haftorn_clock, method = "spearman")$p.value
+
+# check x and y axis limits
+mydata_cleaned %>% summarize(min = min(gestation_day_merged, na.rm = T), max = max(gestation_day_merged, na.rm = T))
+mydata_cleaned %>% summarize(min = min(Haftorn_clock, na.rm = T), max = max(Haftorn_clock, na.rm = T))
+mydata_cleaned %>% summarize(min = min(Knight_clock, na.rm = T), max = max(Knight_clock, na.rm = T))
+mydata_cleaned %>% summarize(min = min(Bohlin_clock, na.rm = T), max = max(Bohlin_clock, na.rm = T))
+
+p1 <- mydata_cleaned %>% 
+  ggplot(aes(x = gestation_day_merged, y = Haftorn_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00")+ 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F) + 
+  labs(
+    title = "Newborns with and without DS (847)",
+    x = "Gestational Age",
+    y = "Haftorn Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   ) +
+  annotate(
+    "text", label = "R=0.579\nP=4.03e-77",
+    x = 200, y = 295, size = 4
+  ) +
+  scale_x_continuous(limits = c(175, 315)) + 
+  scale_y_continuous(limits = c(175, 315))
+
+p2 <- mydata_cleaned %>% 
+  filter(peri_dsal=="dsal") %>% 
+  ggplot(aes(x = gestation_day_merged, y = Haftorn_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00")+ 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F) + 
+  labs(
+    title = "DS newborns (306)",
+    x = "Gestational Age",
+    y = "Haftorn Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   ) +
+  annotate(
+    "text", label = "R=0.585\nP=1.98e-29",
+    x = 200, y = 295, size = 4
+  )+
+  scale_x_continuous(limits = c(175, 315)) + 
+  scale_y_continuous(limits = c(175, 315))
+
+p3 <- mydata_cleaned %>% 
+  filter(peri_dsal=="peri") %>% 
+  ggplot(aes(x = gestation_day_merged, y = Haftorn_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00")+ 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F) + 
+  labs(
+    title = "non-DS newborns (541)",
+    x = "Gestational Age",
+    y = "Haftorn Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   )+
+  annotate(
+    "text", label = "R=0.501\nP=1.07e-35",
+    x = 200, y = 295, size = 4
+  )+
+  scale_x_continuous(limits = c(175, 315)) + 
+  scale_y_continuous(limits = c(175, 315))
+
+p1 + p2 + p3 + plot_layout(ncol = 3)
+
+figures7_s1 <- p1
+figures7_s2 <- p2
+figures7_s3 <- p3
+```
+
+
+# correlation between gestational age and Knight clock in everyone, in DS, and in non-DS people 
+```{r, fig.width= 12, fig.height = }
+# check sample size
+mydata_cleaned %>% filter(!is.na(gestation_day_merged)&!is.na(Knight_clock)) %>% dim() %>% .[1]
+mydata_cleaned %>% filter(peri_dsal=="dsal") %>% filter(!is.na(gestation_day_merged)&!is.na(Knight_clock)) %>% dim() %>% .[1]
+mydata_cleaned %>% filter(peri_dsal=="peri") %>% filter(!is.na(gestation_day_merged)&!is.na(Knight_clock)) %>% dim() %>% .[1]
+# spearman correlation tests 
+cor.test(mydata_cleaned$gestation_day_merged, mydata_cleaned$Knight_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned$gestation_day_merged, mydata_cleaned$Knight_clock, method = "spearman")$p.value 
+cor.test(mydata_cleaned%>%filter(peri_dsal=="dsal") %>% .$gestation_day_merged, mydata_cleaned%>%filter(peri_dsal=="dsal") %>%.$Knight_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned%>%filter(peri_dsal=="dsal") %>% .$gestation_day_merged, mydata_cleaned%>%filter(peri_dsal=="dsal") %>%.$Knight_clock, method = "spearman")$p.value
+cor.test(mydata_cleaned%>%filter(peri_dsal=="peri") %>% .$gestation_day_merged, mydata_cleaned%>%filter(peri_dsal=="peri") %>%.$Knight_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned%>%filter(peri_dsal=="peri") %>% .$gestation_day_merged, mydata_cleaned%>%filter(peri_dsal=="peri") %>%.$Knight_clock, method = "spearman")$p.value
+
+p1 <- mydata_cleaned %>% 
+  ggplot(aes(x = gestation_day_merged, y = Knight_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00")+ 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F) + 
+  labs(
+    title = "Newborns with and without DS (847)",
+    x = "Gestational Age",
+    y = "Knight Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   ) +
+  annotate(
+    "text", label = "R=0.524\nP=4.99e-61",
+    x = 200, y = 295, size = 4
+  ) +
+  scale_x_continuous(limits = c(175, 315)) + 
+  scale_y_continuous(limits = c(175, 315))
+
+p2 <- mydata_cleaned %>% filter(peri_dsal=="dsal") %>% 
+  ggplot(aes(x = gestation_day_merged, y = Knight_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00")+ 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F) +  
+  labs(
+    title = "DS newborns (306)",
+    x = "Gestational Age",
+    y = "Knight Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   ) +
+  annotate(
+    "text", label = "R=0.455\nP=4.99e-17",
+    x = 200, y = 295, size = 4
+  )+
+  scale_x_continuous(limits = c(175, 315)) + 
+  scale_y_continuous(limits = c(175, 315))
+
+p3 <- mydata_cleaned %>% filter(peri_dsal=="peri") %>% 
+  ggplot(aes(x = gestation_day_merged, y = Knight_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00")+ 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F) + 
+  labs(
+    title = "non-DS newborns (541)",
+    x = "Gestational Age",
+    y = "Knight Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   )+
+  annotate(
+    "text", label = "R=0.486\nP=2.41e-33",
+    x = 200, y = 295, size = 4
+  )+
+  scale_x_continuous(limits = c(175, 315)) + 
+  scale_y_continuous(limits = c(175, 315))
+
+p1 + p2 + p3 + plot_layout(ncol = 3)
+
+figures7_s4 <- p1
+figures7_s5 <- p2
+figures7_s6 <- p3
+```
+
+
+# correlation between gestational age and Bohlin clock in everyone, in DS, and in non-DS people 
+```{r, fig.width= 12, fig.height = 4}
+# check sample size
+mydata_cleaned %>% filter(!is.na(gestation_day_merged)&!is.na(Bohlin_clock)) %>% dim() %>% .[1]
+mydata_cleaned %>% filter(peri_dsal=="dsal") %>% filter(!is.na(gestation_day_merged)&!is.na(Bohlin_clock)) %>% dim() %>% .[1]
+mydata_cleaned %>% filter(peri_dsal=="peri") %>% filter(!is.na(gestation_day_merged)&!is.na(Bohlin_clock)) %>% dim() %>% .[1]
+# spearman correlation tests 
+cor.test(mydata_cleaned$gestation_day_merged, mydata_cleaned$Bohlin_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned$gestation_day_merged, mydata_cleaned$Bohlin_clock, method = "spearman")$p.value 
+cor.test(mydata_cleaned%>%filter(peri_dsal=="dsal") %>% .$gestation_day_merged, mydata_cleaned%>%filter(peri_dsal=="dsal") %>%.$Bohlin_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned%>%filter(peri_dsal=="dsal") %>% .$gestation_day_merged, mydata_cleaned%>%filter(peri_dsal=="dsal") %>%.$Bohlin_clock, method = "spearman")$p.value
+cor.test(mydata_cleaned%>%filter(peri_dsal=="peri") %>% .$gestation_day_merged, mydata_cleaned%>%filter(peri_dsal=="peri") %>%.$Bohlin_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned%>%filter(peri_dsal=="peri") %>% .$gestation_day_merged, mydata_cleaned%>%filter(peri_dsal=="peri") %>%.$Bohlin_clock, method = "spearman")$p.value
+
+p1 <- mydata_cleaned %>% ggplot(aes(x = gestation_day_merged, y = Bohlin_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00")+ 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F) + 
+  labs(
+    title = "Newborns with and without DS (847)",
+    x = "Gestational Age",
+    y = "Bohlin Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   ) +
+  annotate(
+    "text", label = "R=0.519\nP=1.26e-59",
+    x = 200, y = 295, size = 4
+  ) +
+  scale_x_continuous(limits = c(175, 315)) + 
+  scale_y_continuous(limits = c(175, 315))
+
+p2 <- mydata_cleaned %>% filter(peri_dsal=="dsal") %>% 
+  ggplot(aes(x = gestation_day_merged, y = Bohlin_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00")+ 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F) + 
+  labs(
+    title = "DS newborns (306)",
+    x = "Gestational Age",
+    y = "Bohlin Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   ) +
+  annotate(
+    "text", label = "R=0.561\nP=1.01e-26",
+    x = 200, y = 295, size = 4
+  )+
+  scale_x_continuous(limits = c(175, 315)) + 
+  scale_y_continuous(limits = c(175, 315))
+
+p3 <- mydata_cleaned %>% filter(peri_dsal=="peri") %>% 
+  ggplot(aes(x = gestation_day_merged, y = Bohlin_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00")+ 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F) + 
+  labs(
+    title = "non-DS newborns (541)",
+    x = "Gestational Age",
+    y = "Bohlin Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   )+
+  annotate(
+    "text", label = "R=0.506\nP=1.92e-36",
+    x = 200, y = 295, size = 4
+  )+
+  scale_x_continuous(limits = c(175, 315)) + 
+  scale_y_continuous(limits = c(175, 315))
+
+
+p1 + p2 + p3 + plot_layout(ncol = 3)
+
+figures7_s7 <- p1
+figures7_s8 <- p2
+figures7_s9 <- p3
+```
+
+
+```{r, fig.width= 12, fig.height = 12}
+figures7_s1 + figures7_s2 + figures7_s3  + figures7_s4 + figures7_s5 + figures7_s6  + figures7_s7 + figures7_s8 + figures7_s9 
+```
+
+
+# correlation between three gestational clocks 
+```{r, fig.width= 12, fig.height = 12}
+# check sample size
+mydata_cleaned %>% filter(!is.na(Haftorn_clock)&!is.na(Bohlin_clock)) %>% dim() %>% .[1]
+mydata_cleaned %>% filter(peri_dsal=="dsal") %>% filter(!is.na(Haftorn_clock)&!is.na(Bohlin_clock)) %>% dim() %>% .[1]
+mydata_cleaned %>% filter(peri_dsal=="peri") %>% filter(!is.na(Haftorn_clock)&!is.na(Bohlin_clock)) %>% dim() %>% .[1]
+# spearman correlation tests 
+cor.test(mydata_cleaned$Haftorn_clock, mydata_cleaned$Knight_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned$Haftorn_clock, mydata_cleaned$Knight_clock, method = "spearman")$p.value
+cor.test(mydata_cleaned$Haftorn_clock, mydata_cleaned$Bohlin_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned$Haftorn_clock, mydata_cleaned$Bohlin_clock, method = "spearman")$p.value
+cor.test(mydata_cleaned$Knight_clock, mydata_cleaned$Bohlin_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned$Knight_clock, mydata_cleaned$Bohlin_clock, method = "spearman")$p.value
+
+cor.test(mydata_cleaned %>% filter(peri_dsal=="dsal") %>% .$Haftorn_clock, mydata_cleaned%>% filter(peri_dsal=="dsal") %>% .$Knight_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned%>% filter(peri_dsal=="dsal") %>% .$Haftorn_clock, mydata_cleaned%>% filter(peri_dsal=="dsal") %>% .$Knight_clock, method = "spearman")$p.value
+cor.test(mydata_cleaned%>% filter(peri_dsal=="dsal") %>% .$Haftorn_clock, mydata_cleaned%>% filter(peri_dsal=="dsal") %>% .$Bohlin_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned%>% filter(peri_dsal=="dsal") %>% .$Haftorn_clock, mydata_cleaned%>% filter(peri_dsal=="dsal") %>% .$Bohlin_clock, method = "spearman")$p.value
+cor.test(mydata_cleaned%>% filter(peri_dsal=="dsal") %>% .$Knight_clock, mydata_cleaned%>% filter(peri_dsal=="dsal") %>% .$Bohlin_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned%>% filter(peri_dsal=="dsal") %>% .$Knight_clock, mydata_cleaned%>% filter(peri_dsal=="dsal") %>% .$Bohlin_clock, method = "spearman")$p.value
+
+cor.test(mydata_cleaned %>% filter(peri_dsal=="peri") %>% .$Haftorn_clock, mydata_cleaned%>% filter(peri_dsal=="peri") %>% .$Knight_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned%>% filter(peri_dsal=="peri") %>% .$Haftorn_clock, mydata_cleaned%>% filter(peri_dsal=="peri") %>% .$Knight_clock, method = "spearman")$p.value
+cor.test(mydata_cleaned%>% filter(peri_dsal=="peri") %>% .$Haftorn_clock, mydata_cleaned%>% filter(peri_dsal=="peri") %>% .$Bohlin_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned%>% filter(peri_dsal=="peri") %>% .$Haftorn_clock, mydata_cleaned%>% filter(peri_dsal=="peri") %>% .$Bohlin_clock, method = "spearman")$p.value
+cor.test(mydata_cleaned%>% filter(peri_dsal=="peri") %>% .$Knight_clock, mydata_cleaned%>% filter(peri_dsal=="peri") %>% .$Bohlin_clock, method = "spearman")$estimate
+cor.test(mydata_cleaned%>% filter(peri_dsal=="peri") %>% .$Knight_clock, mydata_cleaned%>% filter(peri_dsal=="peri") %>% .$Bohlin_clock, method = "spearman")$p.value
+
+
+p1 <- mydata_cleaned %>% 
+  ggplot(aes(x = Haftorn_clock, y = Knight_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00") + 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F)+ 
+  labs(
+    title = "Newborns with and without DS (913)",
+    x = "Haftorn Clock",
+    y = "Knight Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   )+
+  annotate(
+    "text", label = "R=0.812\nP<2.23e-308",
+    x = 210, y = 295, size = 4
+  )+
+  scale_x_continuous(limits = c(187, 308)) + 
+  scale_y_continuous(limits = c(187, 308))
+
+p2 <- mydata_cleaned %>% filter(peri_dsal=="dsal") %>% 
+  ggplot(aes(x = Haftorn_clock, y = Knight_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00") + 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F)+ 
+  labs(
+    title = "DS newborns (346)",
+    x = "Haftorn Clock",
+    y = "Knight Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   )+
+  annotate(
+    "text", label = "R=0.722\nP<2.23e-308",
+    x = 210, y = 295, size = 4
+  )+
+  scale_x_continuous(limits = c(187, 308)) + 
+  scale_y_continuous(limits = c(187, 308))
+
+p3 <- mydata_cleaned %>% filter(peri_dsal=="peri") %>% 
+  ggplot(aes(x = Haftorn_clock, y = Knight_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00") + 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F)+ 
+  labs(
+    title = "non-DS newborns (567)",
+    x = "Haftorn Clock",
+    y = "Knight Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   )+
+  annotate(
+    "text", label = "R=0.771\nP<2.23e-308",
+    x = 210, y = 295, size = 4
+  )+
+  scale_x_continuous(limits = c(187, 308)) + 
+  scale_y_continuous(limits = c(187, 308))
+
+p4 <- mydata_cleaned %>% 
+  ggplot(aes(x = Haftorn_clock, y = Bohlin_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00") + 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F)+  
+  labs(
+    title = "Newborns with and without DS (913)",
+    x = "Haftorn Clock",
+    y = "Bohlin Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   )+
+  annotate(
+    "text", label = "R=0.821\nP<2.23e-308",
+    x = 210, y = 295, size = 4
+  )+
+  scale_x_continuous(limits = c(187, 308)) + 
+  scale_y_continuous(limits = c(187, 308))
+
+p5 <- mydata_cleaned %>% filter(peri_dsal=="dsal") %>% 
+  ggplot(aes(x = Haftorn_clock, y = Bohlin_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00")+ 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F) + 
+  labs(
+    title = "DS newborns (346)",
+    x = "Haftorn Clock",
+    y = "Bohlin Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   )+
+  annotate(
+    "text", label = "R=0.903\nP<2.23e-308",
+    x = 210, y = 295, size = 4
+  )+
+  scale_x_continuous(limits = c(187, 308)) + 
+  scale_y_continuous(limits = c(187, 308))
+
+p6 <- mydata_cleaned %>% filter(peri_dsal=="peri")  %>% 
+  ggplot(aes(x = Haftorn_clock, y = Bohlin_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00") + 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F)+ 
+  labs(
+    title = "non-DS newborns (567)",
+    x = "Haftorn Clock",
+    y = "Bohlin Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   )+
+  annotate(
+    "text", label = "R=0.931\nP<2.23e-308",
+    x = 210, y = 295, size = 4
+  )+
+  scale_x_continuous(limits = c(187, 308)) + 
+  scale_y_continuous(limits = c(187, 308))
+
+p7 <- mydata_cleaned %>% 
+  ggplot(aes(x = Knight_clock, y = Bohlin_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00") + 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F)+ 
+  labs(
+    title = "Newborns with and without DS (913)",
+    x = "Knight Clock",
+    y = "Bohlin Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   )+
+  annotate(
+    "text", label = "R=0.681\nP<2.23e-308",
+    x = 210, y = 295, size = 4
+  )+
+  scale_x_continuous(limits = c(187, 308)) + 
+  scale_y_continuous(limits = c(187, 308))
+
+p8 <- mydata_cleaned %>% filter(peri_dsal=="dsal") %>% 
+  ggplot(aes(x = Knight_clock, y = Bohlin_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00") + 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F)+ 
+  labs(
+    title = "DS newborns (346)",
+    x = "Knight Clock",
+    y = "Bohlin Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   )+
+  annotate(
+    "text", label = "R=0.785\nP<2.23e-308",
+    x = 210, y = 295, size = 4
+  )+
+  scale_x_continuous(limits = c(187, 308)) + 
+  scale_y_continuous(limits = c(187, 308))
+
+p9 <- mydata_cleaned %>% filter(peri_dsal=="peri")  %>% 
+  ggplot(aes(x = Knight_clock, y = Bohlin_clock)) + 
+  geom_abline(intercept = 0, slope = 1,linetype = "dashed",color = "#D55E00") + 
+  geom_point(size = 0.5)  +
+  geom_smooth(method = lm, se = F)+ 
+  labs(
+    title = "non-DS newborns (567)",
+    x = "Knight Clock",
+    y = "Bohlin Clock"
+  ) +
+  theme(
+    plot.margin = margin(0.5, 0.5, 0.5, 0.5, unit = "cm"),
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 10)
+   )+
+  annotate(
+    "text", label = "R=0.785\nP<2.23e-308",
+    x = 210, y = 295, size = 4
+  ) +
+  scale_x_continuous(limits = c(187, 308)) + 
+  scale_y_continuous(limits = c(187, 308))
+
+
+p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9 + plot_layout(ncol = 3)
+```

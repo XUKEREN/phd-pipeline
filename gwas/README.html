@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Genome-wide association study &#8212; phd-pipeline 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          phd-pipeline</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Genome-wide association study</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/gwas/README.md.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section class="tex2jax_ignore mathjax_ignore" id="genome-wide-association-study">
+<h1>Genome-wide association study<a class="headerlink" href="#genome-wide-association-study" title="Permalink to this heading">¶</a></h1>
+<p>This is a workflow that performs GWAS for the AFFY6.0 and 500K datasets.</p>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/f30a65bc8b3ae238bc420f9ea9587699/pre_imputation_qc.sh"><span class="xref download myst">pre_imputation_qc.sh</span></a>. Pre-imputation quality control is based on <a class="reference external" href="https://www.nature.com/articles/nprot.2010.116">Anderson et al.</a> and <a class="reference external" href="https://pubmed.ncbi.nlm.nih.gov/29484742/">Marees et al.</a>.</p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/e884bb6c2a97fba2e0bc1abb5fd3e648/pca_script.sh"><span class="xref download myst">pca_script.sh</span></a> Population stratification: We analyzed population stratification using the genotyping data of independent autosomal SNPs. We next performed global ancestry estimation using ADMIXTURE v1.3, and principal components analysis (PCA) using the smartpca program from EIGENSOFT v6.1.</p></li>
+<li><p>Imputation: Genome-wide imputation was conducted on the Michigan Imputation Server.</p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/400e76dc5036cb2e7595d4ad871f97be/post_imputation.sh"><span class="xref download myst">post_imputation.sh</span></a>: Post imputation quality control: Imputed MAF and the imputation quality score (r2) were used for filtering SNPs. The genetic ancestry PCs were computed with the dosage information from a subset of random autosomal SNPs in linkage equilibrium using plink v2.0 with the 1KGP phase 3 populations as reference.</p></li>
+<li><p>GWAS:</p>
+<ul>
+<li><p><a class="reference download internal" download="" href="../_downloads/9707d8830ba71505d8c56515d485d116/gwas_run.sh"><span class="xref download myst">gwas_run.sh</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/903d7e5565a3e77af064c8534fb83999/gwas_ordinal_logistic.sh"><span class="xref download myst">gwas_ordinal_logistic.sh</span></a></p></li>
+<li><p>The phenotype central nervous system involvement status was classified as CNS1 (no blast cells in CSF), CNS2 (&lt;5 WBC/mul CSF with blast cells), or CNS3 (5 WBC/mul CSF with blast cells, or signs of CNS involvement). To identify the association between the autosomal SNPs and the CNS involvement in ALL cases, we used three types of regressions: (1) linear regression predicting CNS status as a function of the dosages of every variant, (2) firth logistic regression predicting the binomial CNS status (CNS2+CNS3 vs. CNS1) as a function of the dosages of every variant, and (3) ordinal logistic regression predicting the CNS status as a function of the dosages of every variant. We fitted linear regression and firth logistic regression using plink v2.0 and ordinal logistic regression using OrdinalGWAS.jl</p></li>
+</ul>
+</li>
+<li><p><a class="reference download internal" download="" href="../_downloads/09046d83f448ea3d9522f7a4a4760eb3/prs.sh"><span class="xref download myst">prs.sh</span></a>: Polygenetic risk scores for blood-cell traits.</p></li>
+</ul>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2023, Keren Xu.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

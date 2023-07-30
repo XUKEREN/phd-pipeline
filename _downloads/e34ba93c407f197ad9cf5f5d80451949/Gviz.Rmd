@@ -1,0 +1,63 @@
+---
+title: "Gviz_plots"
+author: "KerenXu"
+date: "11/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Gviz 
+```{r, fig.width = 12, fig.height=4}
+library(Gviz)
+
+from <- 50342500
+to <- 50472798
+
+idxTrack <- IdeogramTrack(genome="hg19", chromosome="chr7")
+axTrack <- GenomeAxisTrack()
+knownGenes <- UcscTrack(genome = "hg19", 
+                        chromosome = "chr7", 
+                        track = "knownGene", 
+                        from = from, 
+                        to = to,
+                        trackType = "GeneRegionTrack", 
+                        rstarts = "exonStarts", 
+                        rends = "exonEnds", 
+                        strand = "strand",
+                        name = "IKZF1",
+                        background.title = "transparent", 
+                        fontcolor.title="black", 
+                        fill = "grey")
+
+cpgIslands <- UcscTrack(genome = "hg19", 
+                        chromosome = "chr7", 
+                        track = "cpgIslandExt", 
+                        from = from, 
+                        to = to,
+                        trackType = "AnnotationTrack", 
+                        start = "chromStart", 
+                        end = "chromEnd", 
+                        id = "name", 
+                        name = "CpG Islands", 
+                        background.title = "transparent", 
+                        fontcolor.title="black", 
+                        fill = "grey")
+cpgIslands@range
+
+aTrack.groups <- AnnotationTrack(
+  start = c(50343298, 50357825, 50459043), 
+  width = c(2,2,2), 
+  chromosome = "chr7", 
+  strand = c("+", "+", "+"), 
+  group = c("cg01139861", "cg10551353", "rs78396808"), 
+  genome = "hg19", shape = "box", id = "name", 
+  fill = c("black", "black", "black"), 
+  col= NULL,  name = " ", 
+  background.title = "transparent", 
+  fontcolor.title="black")
+
+plotTracks(list(idxTrack, axTrack, knownGenes,cpgIslands,aTrack.groups), from = from, to = to) 
+```
