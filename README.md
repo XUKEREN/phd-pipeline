@@ -35,7 +35,7 @@ Some workflows I wrote for my phd research projects:
 - [t-test boxplot](./data_visualization/ttest_boxplot/README.md)
 - [Bidirectional Manhattan plot and QQ plot](./ewas/README.md)
 - [SNP CpG association](./data_visualization/snp_cpg_association/README.md)
-- [global ancestry PCA](./data_visualization/global_ancestry_pca/README.md)
+- [Global ancestry PCA](./data_visualization/global_ancestry_pca/README.md)
 
 ## Other
 
