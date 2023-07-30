@@ -4,7 +4,7 @@
 - Visualize admixture results: [admixture_plot.Rmd](./admixture_plot.Rmd)
 
 <p align="center">
-<img src='../../_static/eigenvalue.png' width='800'>
+<img src='../../_static/eigenvalue.png' width='500'>
 </p>
 
 <p align="center">
@@ -16,9 +16,9 @@
 </p>
 
 <p align="center">
-<img src='../../_static/10fold_cv_error.png' width='800'>
+<img src='../../_static/10fold_cv_error.png' width='500'>
 </p>
 
 <p align="center">
-<img src='../../_static/ancestry_proportion.png' width='800'>
+<img src='../../_static/ancestry_proportion.png' width='900'>
 </p>
