@@ -17,7 +17,7 @@ Some workflows I wrote for my phd research projects:
 ## Association studies
 
 - [Epigenome-wide association study](./ewas/README.md)
-- [Genome-wide association study]
+- [Genome-wide association study](./gwas/README.md)
 - [Methylation quantitative trait loci analysis](./mqtl/README.md)
 - [Causal mediation analysis](./mediation_analysis/README.md)
 - [Create summary stats table](./tableone/README.md)
@@ -26,13 +26,16 @@ Some workflows I wrote for my phd research projects:
 
 - [Chord diagram](./data_visualization/chord_diagram/README.md)
 - [Correlation heatmap](./data_visualization/heatmap/README.md)
+- [Heatmap shows overlapping CpGs of epigenetic clocks](./epigenetic_clock/README.md)
+- [Correlation plots](./epigenetic_clock/README.md)
 - [Regression coefficient and CI plot](./data_visualization/regression_coefficient_ci/README.md)
 - [Meta-analysis funnel plot](./data_visualization/meta_analysis_funnel_plot/README.md)
 - [Meta-analysis forest plot](./data_visualization/meta_analysis_forest_plot/README.md)
 - [Sample flow chart](./data_visualization/sample_flow_chart/README.md)
 - [t-test boxplot](./data_visualization/ttest_boxplot/README.md)
 - [Bidirectional Manhattan plot and QQ plot](./ewas/README.md)
-- [SNP CpG association]
+- [SNP CpG association](./data_visualization/snp_cpg_association/README.md)
+- [global ancestry PCA](./data_visualization/global_ancestry_pca/README.md)
 
 ## Other
 
